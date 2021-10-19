@@ -1,0 +1,17 @@
+{
+  "id": "tioanime",
+  "name": "TioAnime",
+  "thumbnail": "tioanime.jpg",
+
+  "active": true,
+
+  "searchable": false,
+  "search_types": ["movie", "tvshow"],
+
+  "categories": ["movie", "tvshow"],
+  "language": ["vose"],
+
+  "clusters": ["anime"],
+
+  "notes": "Web dedicada exclusivamente al anime"
+}
