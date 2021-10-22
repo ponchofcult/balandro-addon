@@ -56,12 +56,12 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas-subtituladas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Catálogo (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino',
+    itemlist.append(item.clone( title = 'Catálogo subtitulado (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=audio-latino',
                                 search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Estrenos', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Estrenos (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino',
+    itemlist.append(item.clone( title = 'Estrenos subtitulado (castellano ó latino)', action = 'list_all', url = host + 'peliculas-subtituladas/?filtro=estrenos&filtro2=audio-latino',
                                 search_type = 'movie', ))
 
     itemlist.append(item.clone( title = 'En DVD', action = 'list_all', url = host + 'calidad/dvd-full/', search_type = 'movie' ))

@@ -83,6 +83,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='', title='Buscar:', text_color='cyan', thumbnail=config.get_thumb('magnifyingglass'), folder=False ))
     itemlist.append(item.clone( channel='search', action='show_help', title = ' - Información sobre búsquedas', folder=False ))
     itemlist.append(item.clone( channel='tmdblists', action='show_help', title= ' - Información búsquedas y listas en TMDB', folder=False ))
+    itemlist.append(item.clone( action='channels_no_searchables', title= ' - Qué canales nunca intervendrán en las búsquedas', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales no intervienen en las búsquedas (desactivados)', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( channel='proxysearch', title = ' - Configurar proxies a usar (en los canales que los necesiten)', action = 'proxysearch_all', thumbnail=config.get_thumb('flame') ))
     itemlist.append(item.clone( channel='filters', title = ' - Excluir canales en las búsquedas', action = 'mainlist', thumbnail=config.get_thumb('stack') ))
@@ -190,6 +191,13 @@ def channels_with_proxies(item):
 
 def channels_no_actives(item):
     logger.info()
+
+    filters.no_actives(item)
+
+def channels_no_searchables(item):
+    logger.info()
+
+    item.no_searchables = True
 
     filters.no_actives(item)
 

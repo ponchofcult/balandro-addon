@@ -309,28 +309,34 @@ def with_proxies(item):
 def no_actives(item):
     logger.info()
 
-    cabecera = 'Canales Desactivados'
-    filtros = {'searchable': True}
+    if item.no_searchables:
+        cabecera = 'Canales que Nunca intervendrán en las búsquedas'
+        filtros = {'searchable': False}
+    else:
+        cabecera = 'Canales Desactivados'
+        filtros = {'searchable': True}
 
     opciones_channels = []
     canales_no_actives = []
 
     ch_list = channeltools.get_channels_list(filtros=filtros)
 
-    i = 0
+    if not item.no_searchables:
+        i = 0
+        for ch in ch_list:
+            if not ch['status'] == -1:
+                continue
+
+            i =+1
+
+        if i == 0:
+            platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales desactivados[/B][/COLOR]' % color_adver)
+            return
+
     for ch in ch_list:
-        if not ch['status'] == -1:
-            continue
-
-        i =+1
-
-    if i == 0:
-        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Sin canales desactivados[/B][/COLOR]' % color_adver)
-        return
-
-    for ch in ch_list:
-        if not ch['status'] == -1:
-            continue
+        if not item.no_searchables:
+            if not ch['status'] == -1:
+                continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
         cfg_proxytools_max_channel = 'channel_' + ch['id'] + '_proxytools_max'
@@ -338,7 +344,13 @@ def no_actives(item):
 
         info = ''
 
-        info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        if not item.no_searchables:
+            info = info + '[B][COLOR %s][I] Desactivado [/I][/B][/COLOR]' % color_list_inactive
+        else:
+            if 'adults' in ch['clusters']:
+                info = info + '[COLOR red][B] Adultos [/B][/COLOR]'
+            elif 'anime' in ch['clusters']:
+                info = info + '[COLOR fuchsia][B] Anime [/B][/COLOR]'
 
         if 'dominios' in ch['notes'].lower():
             dominio = config.get_setting('channel_' + ch['id'] + '_dominio', default='')

@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.nz/'
+host = 'https://dontorrent.rip/'
 
 
 def item_configurar_proxies(item):
@@ -22,11 +22,12 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/dontorrents.org/', '/dontorrent.nz/')
-    url = url.replace('/dontorrents.net/', '/dontorrent.nz/')
-    url = url.replace('/dontorrent.one/', '/dontorrent.nz/')
-    url = url.replace('/dontorrent.app/', '/dontorrent.nz/')
-    url = url.replace('/dontorrent.lol/', '/dontorrent.nz/')
+    url = url.replace('https://dontorrents.org/', host)
+    url = url.replace('https://dontorrents.net/', host)
+    url = url.replace('https://dontorrent.one/', host)
+    url = url.replace('https://dontorrent.app/', host)
+    url = url.replace('https://dontorrent.lol/', host )
+    url = url.replace('https://dontorrent.nz/', host)
 
     # ~ data = httptools.downloadpage(url, post=post).data
     data = httptools.downloadpage_proxy('dontorrents', url, post=post, headers=headers).data

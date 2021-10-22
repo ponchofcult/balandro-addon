@@ -18,9 +18,17 @@ def get_video_url(page_url, url_referer=''):
        video_urls = balandroresolver.resolve_uptobox().getLink(vid, video_urls)
     except Exception as e:
        if '150 minutos' in e:
-         return "Tienes que esperar 150 minutos para poder reproducir de este servidor"
+           return "Debes esperar 150 minutos para poder reproducir"
+       elif 'Unfortunately, the file you want is not available' in e or 'Unfortunately, the video you want to see is not available' in e or 'This stream doesn' in e or 'Page not found' in e or 'Archivo no encontrado' in e:
+           return "El archivo no existe o ha sido borrado"
+       elif "'str' object has no attribute 'get'":
+           return video_urls
 
        return "Acceso temporalmente restringido"
+
+    except:
+       import traceback
+       logger.error(traceback.format_exc(1))
 
     return video_urls
 

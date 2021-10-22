@@ -4,40 +4,50 @@ Version 2.1.2  [COLOR darkorange]Noviembre 2021[/COLOR]
 
    [COLOR yellow]INCIDENCIAS CORREGIDAS:[/COLOR]
       Bugs de la version anterior
-
       Implementado nuevo sistema de Fixes
 
    [COLOR yellow]MODIFICACIONES:[/COLOR]
       Configuracion:
+         Buscar - Que canales nunca se buscara
 
       Menus:
+        Generos: Re-configurados
+        Ayuda: Buscar - Que canales nunca se buscara
+
+      Especiales: Las mejores del cinde de siempre
 
       Canales modificados:
-         CineCalidad, DixMaxLive, HdFull, HdFullCom,
-         HdFullSe, MegaDede2, NewPct1, PlayDede,
+         CineCalidad, CineDeAntes,
+         CineLibreOnline, CineMatteFlix,
+         ClubCine, DixMaxLive, DocumaniaTv,
+         DonTorrents, HdFull, HdFullCom,
+         HdFullSe, MegaDede2, NewPct1,
+         PelisMaraton, PlayDede, PonnHd,
+         PornHub, Repelis24, SeriesKao,
          YesTorrent
 
       Canales anulados:
          PctFenix
 
       Servidores:
+         Streamsb, Upstream, Uptobox Vup
 
    [COLOR yellow]NOVEDADES:[/COLOR]
       Canales:
 
       Servidores:
+         Streamon, Vidhd
 
    [COLOR yellow]SITUACION:[/COLOR]
       [COLOR plum]Canales Inestables:[/COLOR]
-         Dilo
+         Dilo, Repeli24
 
       [COLOR teal]Canales que requieren Cuenta:[/COLOR]
          HdFull, PlayDede
 
       [COLOR cyan]Canales Temporalmente Inactivos:[/COLOR]
          DescargaCineClasico, MiraDetodo, MundoKaos,
-         PelisFan, SeriesManta, SerieZ,
-         VerPeliculasGratis, ZooWoman
+         SeriesManta, VerPeliculasGratis
 
       [COLOR red]Canales que pueden usar proxies (Bloqueo Operadoras):[/COLOR]
          CineTux, Cliver, CliverSite, Cuevana3, Dilo,
@@ -49,17 +59,25 @@ Version 2.1.2  [COLOR darkorange]Noviembre 2021[/COLOR]
          PlayView, SeriesFlix, SeriesYonkis,
          SubTorrents, TorrentDivx
 
+      [COLOR fuchsia]Canales que nunca intervendran en las busquedas:[/COLOR]
+         AniBox. AnimeFenix, AnimeFlv, Beeg, CineDeAntes.
+         CineLibreOnline, CumLoader, DatfSex, HentaiSd,
+         JKAnime, MonosChinos, PornHd, PornHub, OornTube,
+         SeriesAnimadas, SigloXX, TioAnime, TubeHentai,
+         TvSeries, XVideos
+
       [COLOR tan]Servidores con vias alternativas:[/COLOR]
          Doodstream, Youtube
 
    [COLOR yellow]RESUMENES:[/COLOR]
       Numero de Canales:
        139 Canales
-           1 Inestables
+           2 Inestables
            2 Requieren Cuenta
-           8 Temporalmente Inactivos
-         21 Inactivos
-         29 Pueden Usar Proxies
+           5 Temporalmente Inactivos
+         24 Inactivos
+         28 Pueden Usar Proxies
+         20 No intervendran en busquedas
        110 Disponibles
 
       Distribucion Canales Disponibles:
@@ -73,8 +91,8 @@ Version 2.1.2  [COLOR darkorange]Noviembre 2021[/COLOR]
            1 Privados
 
       Numero de Servidores:
-       143 Servidores
+       145 Servidores
          53 Inactivos
          18 Sin Soporte
            2 Con Vias alternativas
-         90 Disponibles
+         92 Disponibles

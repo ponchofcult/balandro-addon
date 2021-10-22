@@ -112,7 +112,9 @@ def anios(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<a href=([^>]+)>([^<]+)</a><br', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '<div class="yearlist">(.*?)</div>')
+
+    matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
         url = urlparse.urljoin(item.url, url)
@@ -198,7 +200,7 @@ def destacadas(item):
     matches = scrapertools.find_multiple_matches(bloque, '<figure>(.*?)</figure>')
 
     for match in matches:
-        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
         title = scrapertools.find_single_match(match, 'alt="(.*?)"')
 
         if not url or not title: continue

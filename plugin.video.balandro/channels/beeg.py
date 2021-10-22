@@ -7,7 +7,6 @@ if sys.version_info[0] >= 3:
 else:
     from urllib import quote
 
-
 import re
 
 from platformcode import config, logger
@@ -18,7 +17,6 @@ from core import httptools, scrapertools, jsontools
 host = 'https://beeg.com/'
 
 url_api = 'https://store.externulls.com/'
-
 
 perpage = 50
 
@@ -128,8 +126,6 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', quality = qlty, url = url, language = 'VO' ))
 
     return sorted(itemlist, key=lambda it: it.quality)
-
-    return itemlist
 
 
 def list_search(item):
