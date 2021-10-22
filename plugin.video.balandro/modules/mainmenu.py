@@ -566,6 +566,8 @@ def submnu_special(item):
 
         itemlist.append(Item( channel='clubcine', action='_bestcinenegro', title=' - Las mejores del cine negro', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
 
+        itemlist.append(Item( channel='clubcine', action='_bestcinedesiempre', title=' - Las mejores del cine de siempre', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
+
         itemlist.append(item.clone( title = 'Películas búsquedas a través de listas:', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
 
         itemlist.append(Item( channel='tmdblists', action='listado', title= ' - En cartelera', extra = 'now_playing', thumbnail=config.get_thumb('movie'), search_type = 'movie' ))

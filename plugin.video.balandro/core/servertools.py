@@ -399,7 +399,7 @@ def corregir_servidor(servidor):
     elif servidor in ['streamta.pe', 'strtapeadblock', 'adblockstrtech', 'adblockstrtape', 'playstp']: return 'streamtape'
     elif servidor in ['sbembed2', 'sbvideo']: return 'sbembed'
     elif servidor in ['streams1', 'streams2']: return 'streams3'
-    elif servidor in ['sbplay', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'sbembed.com', 'playersb']: return 'streamsb'
+    elif servidor in ['sbplay', 'sbplay1', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'embedsb' ,'sbembed.com', 'playersb']: return 'streamsb'
     elif servidor in ['chouhaa']: return 'youwatch'
     elif servidor in ['mega.nz']: return 'mega'
     elif servidor in ['gloria.tv']: return 'gloria'
@@ -517,6 +517,7 @@ def get_parse_hls(video_urls):
 
         khs = part[1]
         hs = '|' + khs
+
         matches = scrapertools.find_multiple_matches(khs, r'(\w+)=([^&]+)')
 
         for key, val in matches:
@@ -526,7 +527,8 @@ def get_parse_hls(video_urls):
         return video_urls
 
     data = httptools.downloadpage(url, headers=headers).data
-    if not isinstance(data, str): data = codecs.decode(data, "utf-8")
+    if not isinstance(data, str):
+        data = codecs.decode(data, "utf-8")
 
     matches = scrapertools.find_multiple_matches(data, r'#EXT-X-STREAM-INF.*?RESOLUTION=(\d+x\d+).*?\s(http.*?)\s')
 

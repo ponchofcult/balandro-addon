@@ -4,24 +4,32 @@
 
 2.1.2:   [COLOR darkorange]Noviembre 2021[/COLOR]
     Correcciones bugs de la version anterior
-
     Implementado nuevo sistema de Fixes
 
     Configuracion:
-
+	    Buscar - Que canales nunca se buscara
     Menus:
+       Generos: Re-configurados
+       Ayuda: Buscar - Que canales nunca se buscara
+    Especiales: Las mejores del cinde de siempre
 
     Canales modificados:
-        CineCalidad, DixMaxLive, HdFull, HdFullCom,
-        HdFullSe, MegaDede2, NewPct1, PlayDede,
+        CineCalidad, CineDeAntes,
+        CineLibreOnline, CineMatteFlix,
+        ClubCine, DixMaxLive, DocumaniaTv,
+        DonTorrents, HdFull, HdFullCom,
+        HdFullSe, MegaDede2, NewPct1,
+        PelisMaraton, PlayDede, PonnHd,
+        PornHub, Repeli24, SeriesKao,
         YesTorrent
-
-    Canales anulados:
+    Canales anulados
         PctFenix
-
     Canales nuevos:
+
     Servidores modificados:
+        Streamsb, Upstream, Uptobox Vup
     Servidores nuevos:
+        Streamon, Vidhd
 
 2.1.1:   [COLOR darkorange]Octubre 2021[/COLOR]
     Correcciones bugs de la version anterior
@@ -31,13 +39,11 @@
         Sub-Menus: Opcion Especiales
         Canales: Eliminar credenciales
         Canales: Nuevas opciones personalizacion
-
     Menus:
         Buscar: Personalizacion busquedas
         Sub-Menus: Especiales
         Generos: re-configurados
         Ayuda: Canales - Nuevas opciones personalizacion
-
     Canales modificados:
         AreaDocumental, Cinecalidad, ClubCine,
         Dilo, DixMaxlive, DonTorrents, HdFull,

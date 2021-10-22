@@ -128,7 +128,8 @@ def list_all(item):
         itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb,
                                     contentType='movie', contentTitle=Title, infoLabels={'year': year} ))
 
-    tmdb.set_infoLabels(itemlist)
+    if not '/search?q=' in item.url:
+        tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, """blog-pager-older-link.*?href='([^']+)""")

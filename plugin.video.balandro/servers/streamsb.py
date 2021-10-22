@@ -9,10 +9,10 @@ def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
     video_urls = []
 
-    page_url = page_url.replace('//cloudemb.com/e/', '//cloudemb.com/')
+    page_url = page_url.replace('//cloudemb.com/e/', '//streamsb.net/play/').replace('//cloudemb.com/d/', '//streamsb.net/play/')
 
     if '//tubesb.com/' in page_url:
-        page_url = page_url.replace('//tubesb.com/e/', '//streamsb.net/play/')
+        page_url = page_url.replace('//tubesb.com/e/', '//streamsb.net/play/').replace('//tubesb.com/d/', '//streamsb.net/play/')
 
     data = httptools.downloadpage(page_url).data
 

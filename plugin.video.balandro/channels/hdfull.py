@@ -115,7 +115,7 @@ def login(item):
                 if password:
                     data = do_make_login_logout(domain)
         else:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen]Falta configurar dominio[/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellowgreen]HdFull Falta configurar Dominio[/COLOR]')
             return False
 
     user = scrapertools.find_single_match(data, '<a href="[^"]+" class="tour-join2 join">([^<]+)<\/a>')
@@ -126,7 +126,7 @@ def login(item):
                 if not status:
                     config.set_setting('hdfull_login', True, 'hdfull')
                 if not item:
-                    platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+                    platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]HdFull Login correcto[/COLOR]')
                 return True
 
     if not username or not password:
@@ -140,7 +140,7 @@ def login(item):
                 if not domain in dominios:
                    config.set_setting('dominio', dominios[0], 'hdfull')
 
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]Credenciales guardadas[/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]HdFull Credenciales guardadas[/COLOR]')
             return False
 
     username = config.get_setting('hdfull_username', 'hdfull', default='')
@@ -156,7 +156,7 @@ def login(item):
         data = do_make_login_logout(url, post=post)
 
         if 'Bienvenido %s' % username in data or "<script>window.location='/'" in data or "<script>window.location=''" in data:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]HdFull Login correcto[/COLOR]')
             if not status:
                 config.set_setting('hdfull_login', True, 'hdfull')
             return True
@@ -175,7 +175,7 @@ def login(item):
         except:
             pass
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR red]Login incorrecto[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR red]HdFull Login incorrecto[/COLOR]')
     return False
 
 
@@ -190,7 +190,7 @@ def logout(item):
 
     config.set_setting('hdfull_login', False, 'hdfull')
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]Sesión cerrada[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]HdFull Sesión cerrada[/COLOR]')
     return 
 
 
@@ -244,7 +244,7 @@ def do_downloadpage(url, post=None, referer=None):
 
     if '<div id="popup_login_result"></div>' in data:
         if not config.get_setting('hdfull_login', 'hdfull', default=False):
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]Debe iniciar la sesión[/B][/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]HdFull Debe iniciar Sesión[/B][/COLOR]')
 
         login('')
         return do_downloadpage(url, post=post, referer=referer)

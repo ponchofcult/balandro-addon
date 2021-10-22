@@ -265,7 +265,7 @@ def personas(item):
     elementos = tmdb.get_person_credits(item.person_id, item.search_type)
 
     if item.search_type == 'crew':
-        elementos = filter(lambda it: 'job' in it and it['job'] == 'Director', elementos)
+        elementos = list(filter(lambda it: 'job' in it and it['job'] == 'Director', elementos))
 
     perpage = 20
     num_elementos = len(elementos)

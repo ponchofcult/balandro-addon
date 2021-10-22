@@ -103,7 +103,7 @@ def login(item):
             return False
 
         if not item:
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]Credenciales guardadas[/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]PlayDede Credenciales guardadas[/COLOR]')
             return False
 
     username = config.get_setting('playdede_username', 'playdede', default='')
@@ -120,16 +120,16 @@ def login(item):
                    if not status:
                        config.set_setting('playdede_login', True, 'playdede')
 
-                   platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+                   platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
                    return True
 
        if 'UserOn' in data:
            if not status:
                config.set_setting('playdede_login', True, 'playdede')
-               platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+               platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            return True
     except:
-       platformtools.dialog_notification(config.__addon_name, '[COLOR red]Sin acceso a la Web[/COLOR]')
+       platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso Web[/COLOR]')
        return False
 
     post = {'user': username, 'pass': password, '_method': 'auth/login'}
@@ -140,40 +140,40 @@ def login(item):
        jdata = jsontools.load(data)
 
        if not jdata['alert']:
-           platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+           platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
            return True
        elif bool(jdata['reload']):
-           platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+           platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
            return True
        else:
-           platformtools.dialog_notification(config.__addon_name, '[COLOR red]Login incorrecto[/COLOR]')
+           platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
            return False
     except:
-       platformtools.dialog_notification(config.__addon_name, '[COLOR red]Sin acceso Login[/COLOR]')
+       platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso Login[/COLOR]')
        return False
 
     if not httptools.get_cookie(host, 'MoviesWebsite'):
         do_make_login_logout(host)
 
     if httptools.get_cookie(host, 'utoken'):
-        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
         return True
 
     try:
        data = do_make_login_logout(host + 'ajax.php', post=post)
     except:
-       platformtools.dialog_notification(config.__addon_name, '[COLOR red]Sin acceso al Login[/COLOR]')
+       platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso al Login[/COLOR]')
        return False
 
     if httptools.get_cookie(host, 'utoken'):
-        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]Login correcto[/COLOR]')
+        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
         return True
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR red]Login incorrecto[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
     return False
 
 
@@ -186,10 +186,10 @@ def logout(item):
         data = do_make_login_logout(host + 'user/' + username + '/salir/')
 
         config.set_setting('playdede_login', False, 'playdede')
-        platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]Sesión cerrada[/COLOR]')
+        platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]PlayDede Sesión cerrada[/COLOR]')
         return True
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR red]No se cerró la sesión[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede No se cerró la Sesión[/COLOR]')
     return False
 
 
@@ -224,7 +224,7 @@ def do_downloadpage(url, post=None, referer=None):
 
     if "data-showform='login'" in data:
         if not config.get_setting('playdede_login', 'playdede', default=False):
-            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]Debe iniciar la sesión[/B][/COLOR]')
+            platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]PlayDede Debe iniciar Sesión[/B][/COLOR]')
 
         login('')
         return do_downloadpage(url, post=post, referer=referer)

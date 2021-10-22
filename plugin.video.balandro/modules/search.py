@@ -125,7 +125,7 @@ def do_search(item, tecleado):
 
     search_limit_by_channel = config.get_setting('search_limit_by_channel', default=2)
 
-    progreso = platformtools.dialog_progress('Buscando '+tecleado, '...')
+    progreso = platformtools.dialog_progress('Buscando ' + tecleado, '...')
 
     filtros = { 'searchable': True, 'status': 0 } # status para descartar desactivados por el usuario, solamente se busca en activos y preferidos
     if item.search_type != 'all': filtros['search_types'] = item.search_type

@@ -18,7 +18,6 @@ color_exec  = config.get_setting('notification_exec_color', default='cyan')
 
 
 channels_poe = [
-        ['documaniatv', 'https://www.documaniatv.com/'],
         ['gdrive', 'https://drive.google.com/drive/']
         ]
 

@@ -8,7 +8,7 @@ else:
     PY3 = True
 
 
-import os, time, re, random
+import os, time, re
 
 from threading import Thread
 
@@ -585,6 +585,7 @@ def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
     logger.info()
 
     url_provider = 'https://spys.one/en/free-proxy-list/'
+
     url_post = 'xpp=0'
     if tipo_proxy == 'anonymous': url_post += 'xf1=3'
     elif tipo_proxy == 'transparent': url_post += 'xf1=2'
@@ -605,7 +606,8 @@ def _spys_one(url, tipo_proxy, pais_proxy, max_proxies):
     for prox, resto in enlaces:
         puerto = ''
         numeros = scrapertools.find_multiple_matches(resto, '\+\(([a-z0-9]{6})\^')
-        for a in numeros: puerto += str(valores[a])
+        for a in numeros:
+            puerto += str(valores[a])
         proxies.append(prox + ':' + puerto)
 
     return proxies
@@ -615,11 +617,14 @@ def _hidemy_name(url, tipo_proxy, pais_proxy, max_proxies):
 
     url_provider = 'https://hidemy.name/es/proxy-list/?'
     url_provider += 'type=' + ('s' if url.startswith('https') else 'h')
-    if pais_proxy != '': url_provider += '&country=' + pais_proxy
+
+    if pais_proxy != '':
+        url_provider += '&country=' + pais_proxy
+
     if tipo_proxy == 'anonymous': url_provider += '&anon=3'
     elif tipo_proxy == 'transparent': url_provider += '&anon=2'
     elif tipo_proxy == 'elite': url_provider += '&anon=4'
-    else:  url_provider += '&anon=1'
+    else: url_provider += '&anon=1&anon=2&anon=3&anon=4'
 
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
@@ -710,83 +715,36 @@ def _spys_me(url, tipo_proxy, pais_proxy, max_proxies):
 def _silverproxy_xyz(url, tipo_proxy, pais_proxy, max_proxies):
     logger.info()
 
-    url_provider = 'https://silverproxy.xyz/getProxies?key=5e8e402056f55c1a9be2ec762787c578&type=socks4&service=all'
-    resp = httptools.downloadpage(url_provider, raise_weberror=False)
-
     proxies = []
-    enlaces = scrapertools.find_multiple_matches(resp.data, '([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+)')
-    for prox in enlaces:
-        proxies.append(prox)
+
+    el_provider = '[B][COLOR %s] Proxyscan.io[/B][/COLOR]' % color_exec
+    platformtools.dialog_notification('Silverproxy', 'Vía' + el_provider)
+
+    url_provider = 'https://www.proxyscan.io'
+    resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
+
+    enlaces = scrapertools.find_multiple_matches(resp.data, '<th scope="row">(.*?)</th>.*?<td>(.*?)</td>')
+
+    for prox, port in enlaces:
+        if not prox or not port: continue
+
+        proxies.append(prox + ':' + port)
 
     if not proxies:
-        provs = [1, 2, 3, 4]
-        alea = random.choice(provs)
+        el_provider = '[B][COLOR %s] Xroxy.com[/B][/COLOR]' % color_exec
+        platformtools.dialog_notification('Silverproxy', 'Vía' + el_provider)
 
-        if alea == 1:
-            platformtools.dialog_notification('Silverproxy', 'Vía alternativa ' + str(alea))
+        url_provider = 'https://www.xroxy.com/proxylist.htm'
+        resp = httptools.downloadpage(url_provider, raise_weberror=False)
 
-            try:
-               url_provider = 'https://www.xroxy.com/proxylist.htm'
-               resp = httptools.downloadpage(url_provider, raise_weberror=False)
+        enlaces = scrapertools.find_multiple_matches(resp.data, "'View this Proxy details'>(.*?)<.*?Select proxies with port number.*?>(.*?)</a>")
+        for prox, port in enlaces:
+            prox = prox.strip()
+            port = port.strip()
 
-               enlaces = scrapertools.find_multiple_matches(resp.data, "'View this Proxy details'>(.*?)<.*?Select proxies with port number.*?>(.*?)</a>")
-               for prox, port in enlaces:
-                   prox = prox.strip()
-                   port = port.strip()
+            if not prox or not port: continue
 
-                   if not prox or not port: continue
-
-                   proxies.append(prox + ':' + port)
-            except:
-               pass
-
-        elif alea == 2:
-            platformtools.dialog_notification('Silverproxy', 'Vía alternativa ' + str(alea))
-
-            try:
-               url_provider = 'https://openproxy.space/list/6cjS-jq3w4'
-               resp = httptools.downloadpage(url_provider, raise_weberror=False)
-
-               enlaces = scrapertools.find_multiple_matches(resp.data, 'count:b,items.*?"(.*?)"')
-               for prox in enlaces:
-                   if prox:
-                       proxies.append(prox)
-            except:
-               pass
-
-        elif alea == 3:
-            platformtools.dialog_notification('Silverproxy', 'Vía alternativa ' + str(alea))
-
-            try:
-               url_provider = 'http://www.proxylists.net/'
-               resp = httptools.downloadpage(url_provider, raise_weberror=False, follow_redirects=False)
-
-               bloques = scrapertools.find_multiple_matches(resp.data, '<td><a href=".*?</a>(.*?)</td>')
-
-               for block in bloques: 
-                   enlaces = scrapertools.find_multiple_matches(block, "(.*?)<br />")
-
-                   for prox in enlaces:
-                       prox = prox.strip()
-                       if prox:
-                           proxies.append(prox)
-            except:
-               pass
-
-        elif alea == 4:
-            platformtools.dialog_notification('Silverproxy', 'Vía alternativa ' + str(alea))
-
-            try:
-               url_provider = 'https://www.proxyscan.io/'
-               resp = httptools.downloadpage(url_provider, raise_weberror=False)
-
-               enlaces = scrapertools.find_multiple_matches(resp.data, '<th scope="row">(.*?)</th>.*?<td>(.*?)</td>')
-               for prox, port in enlaces:
-                   if not prox or not port: continue
-
-                   proxies.append(prox + ':' + port)
-            except:
-               pass
+            proxies.append(prox + ':' + port)
 
     return proxies
 

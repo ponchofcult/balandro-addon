@@ -202,12 +202,12 @@ def mainlist_pelis(item):
     itemlist.append(item.clone( title = 'Por dirección', action = 'list_labels', url = host, group = 'DIRECTORES'))
     itemlist.append(item.clone( title = 'Por interprete', action = 'list_labels', url = host, group = 'ACTORES' ))
 
-    itemlist.append(item.clone( title = 'Las mejores de la historia (Filmaffinity)', action = 'list_best', thumbnail = thumb_filmaffinity,
+    itemlist.append(item.clone( title = 'Las mejores de la historia', action = 'list_best', thumbnail = thumb_filmaffinity,
                                 url = host + '2018/11/ver-las-150-mejores-peliculas-de-la.html' ))
-    itemlist.append(item.clone( title = 'Las mejores del cine negro (IMDb)', action = 'list_best', thumbnail = thumb_imdb,
+    itemlist.append(item.clone( title = 'Las mejores del cine negro', action = 'list_best', thumbnail = thumb_imdb,
                                 url = host + '2020/10/ver-las-150-mejores-peliculas-de-cine.html' ))
 
-    itemlist.append(item.clone( title = 'Las mejores del cine español (IMDb)', action = 'list_best',
+    itemlist.append(item.clone( title = 'Las mejores del cine español', action = 'list_best',
                                 url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html' ))
 
 
@@ -932,6 +932,13 @@ def _besthistoria(item):
 
     return list_best(item)
 
+def _bestcinespa(item):
+    logger.info()
+
+    item.url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html'
+
+    return list_best(item)
+
 def _bestcinenegro(item):
     logger.info()
 
@@ -939,12 +946,12 @@ def _bestcinenegro(item):
 
     return list_best(item)
 
-def _bestcinespa(item):
+def _bestcinedesiempre(item):
     logger.info()
 
-    item.url = host + '2021/04/ver-las-100-mejores-peliculas-de-la.html'
+    item.url = 'https://cinedesiempre.tumblr.com'
 
-    return list_best(item)
+    return list_tumblr(item)
 
 
 def search(item, texto):

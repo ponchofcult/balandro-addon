@@ -3,8 +3,9 @@
 import sys
 
 if sys.version_info[0] < 3:
-    pass
+    PY3 = False
 else:
+    PY3 = True
     unicode = str
 
 
@@ -26,12 +27,9 @@ color_list_proxies = config.get_setting('channels_list_proxies_color', default='
 
 CLONES = [
    ['atomix', 'https://atomixhq.com/', 'movie, tvshow', 'atomixhq.png'],
-   # ~ ['pctreload', 'https://pctreload1.com/', 'movie, tvshow', 'pctreload.png'],
-   # ~ ['maxitorrent', 'https://maxitorrent.com/', 'movie, tvshow', 'maxitorrent.jpg'],
    ['descargas2020', 'https://descargas2020.net/', 'movie', 'descargas2020.jpg']
    ]
 
-# ~ 'maxitorrent'    los .torrent disparan a 'pctreload'  pueden requerir proxies
 # ~ 'descargas2020'  prescindimos de series y buscar      sin proxies
 
 # ~ Para una misma peli/serie no siempre hay uno sólo enlace, pueden ser múltiples. La videoteca de momento no está preparada para acumular
@@ -259,6 +257,7 @@ def list_all(item):
 
         title = limpiar_titulo(title, quitar_sufijo)
         titulo = title
+
         if item.search_type == 'tvshow':
             m = re.match(r"^(.*?) - (Temporada \d+) Capitulo \d*", title)
             if not m:
@@ -337,9 +336,11 @@ def episodios(item):
     for article in matches:
         url = scrapertools.find_single_match(article, ' href="([^"]+)"')
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
+
         title = scrapertools.find_single_match(article, '<strong[^>]*>(.*?)</strong>')
         if title == '':
             title = scrapertools.find_single_match(article, '<h2[^>]*>(.*?)</h2>')
+
         title = scrapertools.htmlclean(title)
 
         show, season, episode = extrae_show_s_e(title)
@@ -464,14 +465,33 @@ def play(item):
     itemlist = []
 
     if item.url.endswith('.torrent'):
-        if config.get_setting('proxies', item.channel, default=''):
+        if '/atomtt.com/' in item.url:
+            item.url = item.url.replace('/download/', '/download-link/').replace('.torrent', '')
+
+            if config.get_setting('proxies', item.channel, default=''):
+                data = do_downloadpage(item, item.url)
+
+                file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
+                with open(file_local, 'wb') as f: f.write(data); f.close()
+                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+
+        else:
             data = do_downloadpage(item, item.url)
 
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
-        else:
-            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+            new_url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
+            if new_url:
+                if config.get_setting('proxies', item.channel, default=''):
+                    data = do_downloadpage(item, new_url)
+
+                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
+                    if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
+                    with open(file_local, 'wb') as f: f.write(data); f.close()
+                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+                else:
+                    itemlist.append(item.clone( url = new_url, server = 'torrent' ))
 
     else:
         itemlist.append(item.clone( url= item.url, server = item.server ))

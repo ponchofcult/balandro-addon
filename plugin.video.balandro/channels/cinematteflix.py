@@ -128,7 +128,8 @@ def list_all(item):
             itemlist.append(item.clone( action = 'list_col', url = url, title = title, thumbnail = thumb, languages = langs, grupo = 'colec',
                                         contentType = 'movie', contentTitle = title, infoLabels={'year': year} ))
 
-    tmdb.set_infoLabels(itemlist)
+    if not '/?s=' in item.url:
+        tmdb.set_infoLabels(itemlist)
 
     if itemlist:
         if '>Siguientes<' in data:
