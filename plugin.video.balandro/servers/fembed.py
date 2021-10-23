@@ -10,7 +10,7 @@ def get_video_url(page_url, url_referer=''):
 
     page_url = page_url.replace('/fembeder.com/', '/www.fembed.com/').replace('/divload.com/', '/www.fembed.com/').replace('/ilovefembed.best/', '/www.fembed.com/').replace('/myurlshort.live/', '/www.fembed.com/')
     page_url = page_url.replace('/jplayer.club/', '/www.fembed.com/').replace('/fembedisthebest.rest/', '/www.fembed.com/').replace('/pelispng.online/', '/www.fembed.com/').replace('/hlshd.xyz/', '/www.fembed.com/')
-    page_url = page_url.replace('/embedsito.com/', '/www.fembed.com/').replace('/mrdhan.com/', '/www.fembed.com/').replace('/dutrag.com/', '/www.fembed.com/')
+    page_url = page_url.replace('/embedsito.com/', '/www.fembed.com/').replace('/mrdhan.com/', '/www.fembed.com/').replace('/dutrag.com/', '/www.fembed.com/').replace('/fplayer.info/', '/www.fembed.com/')
 
     if 'fembed.com' in page_url:
         page_url = page_url.replace('/fembed.com/', '/www.fembed.com/')

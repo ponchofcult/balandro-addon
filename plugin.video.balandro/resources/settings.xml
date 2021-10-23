@@ -8,9 +8,9 @@
         <setting type="sep"/>
         <setting label="Opciones para el menú principal:" type="lsep"/>
         <setting id="mnu_oppciones" type="bool" label="Seleccionar opciones" default="false"/>
-        <setting id="channels_link_main" type="bool" label="Añadir la opción Canales" default="true" visible="eq(-1,true)"/>
-        <setting id="mnu_idiomas" type="bool" label="Añadir la opción Idiomas" default="true" visible="eq(-2,true)"/>
-        <setting id="mnu_grupos" type="bool" label="Añadir la opción Grupos" default="true" visible="eq(-3,true)"/>
+        <setting id="channels_link_main" type="bool" label="Añadir la opción Canales (simplificado y principal)" default="true" visible="eq(-1,true)"/>
+        <setting id="mnu_idiomas" type="bool" label="Añadir la opción Idiomas (simplificado y principal)" default="true" visible="eq(-2,true)"/>
+        <setting id="mnu_grupos" type="bool" label="Añadir la opción Grupos (simplificado y principal)" default="true" visible="eq(-3,true)"/>
         <setting id="mnu_pelis" type="bool" label="Añadir la opción Películas" default="true" visible="eq(-4,true)"/>
         <setting id="mnu_series" type="bool" label="Añadir la opción Series" default="true" visible="eq(-5,true)"/>
         <setting id="channels_link_pyse" type="bool" label="Añadir la opción Películas y Series (solo los canales con ambos contenidos)" default="false" visible="eq(-6,true)"/>

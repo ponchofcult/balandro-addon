@@ -172,6 +172,11 @@ def _proxies(item):
         item.channel = 'playview'
         playview.configurar_proxies(item)
 
+    elif item.from_channel == 'ppeliculas':
+        from channels import ppeliculas
+        item.channel = 'ppeliculas'
+        ppeliculas.configurar_proxies(item)
+
     elif item.from_channel == 'seriesflix':
         from channels import seriesflix
         item.channel = 'seriesflix'

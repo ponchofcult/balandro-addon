@@ -316,6 +316,7 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
@@ -339,6 +340,7 @@ def findvideos(item):
             if url:
                 other = ''
                 if '.animekao.club/embed' in url: other = 'kplayer'
+                elif 'kaocentro.net' in url: other = 'kplayer'
                 elif 'kaodrive/embed.php' in url: other = 'amazon'
                 elif 'hydrax.com' in url: other = 'hydrax'
                 elif '.xyz/v/' in url: other = 'fembed'
@@ -364,7 +366,7 @@ def play(item):
 
     url = item.url
 
-    if '.animekao.club/embed' in url:
+    if '.animekao.club/embed' in url or '.kaocentro.net/embed' in url:
         from lib import jsunpack
         sdata = httptools.downloadpage(url).data
 
