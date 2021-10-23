@@ -14,7 +14,11 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     if '/fecha/' in url:
         raise_weberror = False
 
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    timeout = None
+    if 'wp-admin/admin-ajax.php' in url:
+        timeout = 30
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
     return data
 
 

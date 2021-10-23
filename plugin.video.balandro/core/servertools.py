@@ -394,7 +394,7 @@ def corregir_servidor(servidor):
     elif servidor in ['powvideo', 'povwideo', 'powvldeo', 'powv1deo', 'povw1deo']: return 'powvideo'
     elif servidor in ['streamplay', 'steamplay', 'streamp1ay']: return 'streamplay'
 
-    elif servidor in ['fembed', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag']: return 'fembed'
+    elif servidor in ['fembed', 'fembeder', 'divload', 'ilovefembed', 'myurlshort', 'jplayer', 'feurl', 'fembedisthebest', 'femax20', 'fcdn', 'fembad', 'pelispng', 'hlshd', 'embedsito', 'mrdhan', 'dutrag', 'fplayer']: return 'fembed'
     elif servidor in ['evoplay']: return 'evoload'
     elif servidor in ['streamta.pe', 'strtapeadblock', 'adblockstrtech', 'adblockstrtape', 'playstp']: return 'streamtape'
     elif servidor in ['sbembed2', 'sbvideo']: return 'sbembed'

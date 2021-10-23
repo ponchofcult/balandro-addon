@@ -21,8 +21,7 @@ servers_poe = [
         ['directo'],
         ['gamovideo'],
         ['m3u8hls'],
-        ['torrent'],
-        ['vshare']
+        ['torrent']
         ]
 
 

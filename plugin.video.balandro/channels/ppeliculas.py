@@ -7,8 +7,18 @@ from core import httptools, scrapertools, servertools, tmdb
 host = 'https://www.pepeliculas.org/'
 
 
+def item_configurar_proxies(item):
+    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
+    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
+    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
+
+def configurar_proxies(item):
+    from core import proxytools
+    return proxytools.configurar_proxies_canal(item.channel, host)
+
 def do_downloadpage(url, post=None, headers=None):
-    data = httptools.downloadpage(url, post=post, headers=headers).data
+    # ~ data = httptools.downloadpage(url, post=post, headers=headers).data
+    data = httptools.downloadpage_proxy('ppeliculas', url, post=post, headers=headers).data
 
     return data
 
@@ -21,6 +31,8 @@ def mainlist(item):
     itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -41,6 +53,8 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
+    itemlist.append(item_configurar_proxies(item))
+
     return itemlist
 
 
@@ -57,6 +71,8 @@ def mainlist_series(item):
     itemlist.append(item.clone( title = 'Más valoradas', action = 'list_top', url = host, search_type = 'tvshow' ))
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
+
+    itemlist.append(item_configurar_proxies(item))
 
     return itemlist
 
@@ -457,7 +473,7 @@ def play(item):
     url = item.url
 
     if item.other == 'v' or item.other == 'd':
-        resp = httptools.downloadpage(item.url, follow_redirects=False)
+        resp = httptools.downloadpage_proxy('ppeliculas', item.url, follow_redirects=False)
         if 'location' in resp.headers:
             url = resp.headers['location']
 
