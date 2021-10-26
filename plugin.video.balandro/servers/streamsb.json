@@ -51,6 +51,14 @@
       {
         "pattern": "(?:playersb.com)/(?:embed-|d/|e/)([A-z0-9]+)",
         "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbcloud1.com)/(?:embed-|d/|e/)([A-z0-9]+)",
+        "url": "https://streamsb.net/play/\\1"
+      },
+      {
+        "pattern": "(?:sbcloud1.com)/([A-z0-9]+).html",
+        "url": "https://streamsb.net/play/\\1"
       }
     ]
   }
