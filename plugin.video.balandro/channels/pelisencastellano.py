@@ -119,27 +119,28 @@ def findvideos(item):
 
     ses = 0
 
-    qlty = scrapertools.find_single_match(data, '<strong>Calidad: </strong> (\d+)p<')
+    qlty = scrapertools.find_single_match(data, '<strong>Calidad: </strong> (\d+)p<').strip()
 
-    output = scrapertools.find_single_match(data, 'var output = "(.*?)output ').replace('\\', '')
-    output = output.split(';')
+    outputs = scrapertools.find_single_match(data, 'var output = "(.*?)output ').replace('\\', '')
+    outputs = outputs.split(';')
 
-    online = scrapertools.find_single_match(data, '<div class="centradito"><script>[A-z0-9]+ \(([^\)]+)')
-    online = online.replace('"', '').split(',')
+    onlines = scrapertools.find_single_match(data, '<div class="centradito"><script>[A-z0-9]+ \(([^\)]+)')
+    onlines = onlines.replace('"', '').split(',')
 
-    for elem in output:
+    for elem in outputs:
         ses += 1
 
-        if "href" in elem:
-            ref = scrapertools.find_single_match(elem, 'href="([^"]+)"')
+        if 'href' in elem:
+            href = scrapertools.find_single_match(elem, 'href="([^"]+)"')
+            if 'no.html'in href: continue
 
-            id = scrapertools.find_single_match(elem, 'codigo(\d+)')
-            id = (int(id)-1)
+            iden = scrapertools.find_single_match(elem, 'codigo(\d+)')
+            if not iden: continue
 
-            if 'codigo' in ref:
-                url = online[id]
-            else:
-                url = "%s%s" %(ref, online[id])
+            iden = (int(iden)-1)
+
+            if 'codigo' in href: url = onlines[iden]
+            else: url = "%s%s" %(href, onlines[iden])
 
             if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
                 continue
@@ -147,7 +148,7 @@ def findvideos(item):
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
 
-            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lng ))
+            itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lng ))
 
     # descarga
     url = scrapertools.find_single_match(data, "var abc = '([^']+)'")
@@ -158,7 +159,7 @@ def findvideos(item):
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, language = lng ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', server = servidor, url = url, quality = qlty, language = lng ))
 
     if not itemlist:
         if not ses == 0:

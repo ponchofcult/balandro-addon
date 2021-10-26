@@ -1,0 +1,17 @@
+{
+  "id": "verpeliculasrd",
+  "name": "VerpPeliculasRd",
+  "thumbnail": "verpeliculasrd.png",
+
+  "active": true,
+
+  "searchable": true,
+  "search_types": ["movie"],
+
+  "categories": ["movie"],
+  "language": ["lat", "vose"],
+
+  "clusters": ["classic", "years", "kids", "docs", "vos"],
+
+  "notes": "Películas en español, por géneros."
+}
