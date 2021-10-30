@@ -140,6 +140,8 @@ def list_all(item):
 
         if not url or not title: continue
 
+        title = title.replace('&ntilde;', 'ñ')
+
         tipo = 'tvshow' if '<b>Serie</b>' in match else 'movie'
         if tipo == 'movie':
             if '<b>Anime</b>' in match: tipo = 'tvshow'
@@ -231,7 +233,7 @@ def temporadas(item):
     data = do_downloadpage(opts_url, post = post)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    temporadas = re.compile("Temporada (.*?)</a>", re.DOTALL).findall(data)
+    temporadas = re.compile("Temporada (.*?)<", re.DOTALL).findall(data)
 
     for tempo in temporadas:
         tempo = tempo.strip()
@@ -266,7 +268,7 @@ def episodios(item):
     data = do_downloadpage(opts_url, post = post)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile(' temp">.*?href="(.*?)".*?xhref=".*?cap=(.*?)".*?class="btn btn-large">(.*?)</a>', re.DOTALL).findall(data)
+    matches = re.compile(' temp">.*?href="(.*?)".*?xhref=".*?cap=(.*?)".*?class="btn btn-large">(.*?)<', re.DOTALL).findall(data)
 
     for url, epis, title in matches[item.page * perpage:]:
         url = host + url
@@ -287,7 +289,7 @@ def episodios(item):
 
 
 def puntuar_calidad(txt):
-    orden = ['cam', '360p', '480p', 'RHDTV', 'HD', '720p', '1080p']
+    orden = ['cam', '360p', '480p', 'RHDTV', 'HDTV', 'HD', '720p', '1080p']
     txt = txt.replace('HD', '').replace('CAM', '').replace('S', '').strip()
     if txt not in orden: return 0
     else: return orden.index(txt) + 1

@@ -1,6 +1,6 @@
 {
   "id": "verpeliculasrd",
-  "name": "VerpPeliculasRd",
+  "name": "VerPeliculasRd",
   "thumbnail": "verpeliculasrd.png",
 
   "active": true,
@@ -11,7 +11,7 @@
   "categories": ["movie"],
   "language": ["lat", "vose"],
 
-  "clusters": ["classic", "years", "kids", "docs", "vos"],
+  "clusters": ["classic", "news", "years", "rankings", "kids", "docs", "vos"],
 
   "notes": "Películas en español, por géneros."
 }

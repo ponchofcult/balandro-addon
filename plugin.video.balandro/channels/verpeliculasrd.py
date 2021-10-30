@@ -28,6 +28,9 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
 
+    itemlist.append(item.clone( title = 'Novedades', action = 'list_all', url = host, group = 'news', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Más valoradas', action = 'list_all', url = host, group = 'mval', search_type = 'movie' ))
+
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
@@ -81,12 +84,20 @@ def list_all(item):
     data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile('<div class="item-temporada pull-left">(.*?)</a></div>').findall(data)
+    if item.group == 'news':
+         matches = re.compile('<li id="slider(.*?)</a></li>').findall(data)
+    elif item.group == 'mval':
+         matches = re.compile('<div class="slider__section">(.*?)</a></div>').findall(data)
+    else:
+        matches = re.compile('<div class="item-temporada pull-left">(.*?)</a></div>').findall(data)
 
     num_matches = len(matches)
 
     for match in matches[item.page * perpage:]:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+        if not url:
+            url = scrapertools.find_single_match(match, 'href=(.*?)"')
+
         title = scrapertools.find_single_match(match, ' alt="(.*?)"').strip()
         if not title:
             title = scrapertools.find_single_match(match, '<div class="item-detail"><p>(.*?)</p>').strip()
@@ -102,6 +113,11 @@ def list_all(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         thumb = host + thumb
+
+        if '..' in url:
+            url = url.replace('..', '').replace('///', '')
+
+        url = url.replace('/peliculas/', 'peliculas/')
 
         url = host + url
 
@@ -140,7 +156,7 @@ def findvideos(item):
             if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
                 continue
 
-            qlty = scrapertools.find_single_match(match, 'data-quality=="([^"]+)"')
+            qlty = scrapertools.find_single_match(match, 'data-quality="([^"]+)"')
 
             servidor = servertools.get_server_from_url(url)
             servidor = servertools.corregir_servidor(servidor)
@@ -171,7 +187,10 @@ def list_search(item):
     matches = re.compile('<div class="item-temporada pull-left">(.*?)</a></div>').findall(data)
 
     for match in matches:
-        url = scrapertools.find_single_match(match, ' href="(.*?)"')
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
+        if not url:
+            url = scrapertools.find_single_match(match, 'href=(.*?)"')
+
         title = scrapertools.find_single_match(match, ' alt="(.*?)"').strip()
         if not title:
             title = scrapertools.find_single_match(match, '<div class="item-detail"><p>(.*?)</p>').strip()
@@ -192,6 +211,11 @@ def list_search(item):
         thumb = scrapertools.find_single_match(match, ' src="(.*?)"')
 
         thumb = host + thumb
+
+        if '..' in url:
+            url = url.replace('..', '').replace('///', '')
+
+        url = url.replace('/peliculas/', 'peliculas/')
 
         url = host + url
 

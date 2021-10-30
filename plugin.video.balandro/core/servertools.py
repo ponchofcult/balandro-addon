@@ -400,6 +400,9 @@ def corregir_servidor(servidor):
     elif servidor in ['sbembed2', 'sbvideo']: return 'sbembed'
     elif servidor in ['streams1', 'streams2']: return 'streams3'
     elif servidor in ['sbplay', 'sbplay1', 'pelistop', 'cloudemb', 'tubesb', 'sbembed', 'embedsb' ,'sbembed.com', 'playersb', 'sbcloud1']: return 'streamsb'
+
+    elif servidor in ['highload', 'streamon']: return 'highload'
+
     elif servidor in ['chouhaa']: return 'youwatch'
     elif servidor in ['mega.nz']: return 'mega'
     elif servidor in ['gloria.tv']: return 'gloria'

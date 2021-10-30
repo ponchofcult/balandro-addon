@@ -187,6 +187,7 @@ def episodios(item):
     season = str(item.contentSeason)
 
     for episode, info in matches[item.page * perpage:]:
+
         if season.startswith('0'):
             season = season.replace('0', '')
 
@@ -215,7 +216,7 @@ def episodios(item):
         itemlist.append(item.clone( title=">> Página siguiente", action="episodios", data_epi = item.data_epi, hash = item.hash, orden = '10000',
                                     page=item.page + 1, text_color='coral' ))
 
-    itemlist = sorted(itemlist, key=lambda i: i.orden)
+    return sorted(itemlist, key=lambda i: i.orden)
 
 
 def findvideos(item):

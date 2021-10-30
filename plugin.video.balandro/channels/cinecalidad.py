@@ -311,7 +311,7 @@ def findvideos(item):
         for video, servidor in matches:
             ses += 1
 
-            servidor = servidor.lower()
+            servidor = servidor.lower().strip()
 
             if servidor == "trailer": continue
             elif servidor == 'veri': continue
@@ -345,7 +345,7 @@ def findvideos(item):
          for url, servidor in matches:
              ses += 1
 
-             servidor = servidor.lower()
+             servidor = servidor.lower().strip()
 
              if servidor == "subtítulos" or servidor == 'subtitulos': continue
              elif servidor == 'veri': continue
@@ -367,8 +367,8 @@ def findvideos(item):
              if servidor == 'mega':
                  if url.startswith('#'):
                      url = 'https://mega.nz/' + url
-                 elif not video.startswith('http'):
-                     video = 'https://mega.nz/file/' + video
+                 elif not url.startswith('http'):
+                     url = 'https://mega.nz/file/' + url
 
              itemlist.append(Item(channel = item.channel, action = 'play', server = servidor, title = '', url = url, quality = qlty, language = lang ))
 
