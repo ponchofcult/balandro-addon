@@ -140,7 +140,7 @@ def configurar_proxies_canal(canal, url):
                          sin_news_proxies(provider_fijo, proxies_actuales, procesar)
 
     # Aunque venga por automático y haya localizado nuevos proxies, hay que entrar por si se modifican o se quitan,
-    # o pq no van bien  excepto que inicialmente el canal no tuviera proxies memorizados
+    # o pq no van bien, excepto que inicialmente el canal no tuviera proxies memorizados
 
     if not proxies_iniciales:
         proxies = config.get_setting('proxies', canal, default='').strip()
@@ -179,7 +179,7 @@ def configurar_proxies_canal(canal, url):
 
         ret = platformtools.dialog_select('Configuración proxies para %s' % canal.capitalize(), acciones, useDetails=True)
 
-        if ret == -1: # cancel
+        if ret == -1:
             break
 
         elif ret == 0:
@@ -212,7 +212,7 @@ def configurar_proxies_canal(canal, url):
 
             if search_provider:
                 if _buscar_proxies(canal, url, provider, procesar):
-                    break # si no se encuentran proxies válidos seguir para poder cambiar parámetros o entrar manualmente
+                    break
 
         elif ret == 2:
             _settings_proxies_canal(canal, opciones_provider)
@@ -235,7 +235,6 @@ def configurar_proxies_canal(canal, url):
     return True
 
 
-# Diálogos para guardar las diferentes opciones de búsqueda
 def _settings_proxies_canal(canal, opciones_provider):
     logger.info()
 
@@ -313,7 +312,6 @@ def _buscar_proxies(canal, url, provider, procesar):
 
     provider_canal, tipo_proxy, pais_proxy, max_proxies = get_settings_proxytools(canal)
 
-    # Obtener lista de proxies
     all_providers_proxies = []
 
     search_provider = False
@@ -443,7 +441,6 @@ def _buscar_proxies(canal, url, provider, procesar):
         proxies = re.compile('\d+\.\d+\.\d+\.\d+\:\d+', re.DOTALL).findall(str(proxies))
 
     if max_proxies: proxies = proxies[:max_proxies]
-    # ~ logger.debug(proxies)
 
     # Testear proxies
     if search_provider:
@@ -503,7 +500,7 @@ def _buscar_proxies(canal, url, provider, procesar):
             if provider == private_list:
                 platformtools.dialog_notification('Buscar proxies', 'Sin proxies válidos [B][COLOR %s]en su lista[/COLOR][/B]' % color_alert)
 
-    # Apuntar resultados en proxies.log
+
     if config.get_setting('developer_mode', default=False):
         proxies_log = os.path.join(config.get_data_path(), 'proxies.log')
 
@@ -753,9 +750,8 @@ def _proxyscrape_com(url, tipo_proxy, pais_proxy, max_proxies):
 
     # API: https://proxyscrape.com/api-documentation
     url_provider = 'https://api.proxyscrape.com/?request=displayproxies'
-    url_provider += '&proxytype=' + ('https' if url.startswith('https') else 'http')  # http, socks4, socks5
-    # ~ url_provider += '&ssl=' + ('yes' if url.startswith('https') else 'no')
-    url_provider += '&ssl=all' # para evitar ssl=no ya que hay poquísimos proxies !?
+    url_provider += '&proxytype=' + ('https' if url.startswith('https') else 'http')
+    url_provider += '&ssl=all'
     if tipo_proxy != '': url_provider += '&anonymity=' + tipo_proxy
     if pais_proxy != '': url_provider += '&country=' + pais_proxy
 
@@ -774,7 +770,6 @@ def _proxyservers_pro(url, tipo_proxy, pais_proxy, max_proxies):
     url_provider += '/order/updated/order_dir/desc/page/1'
 
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
-    # ~ logger.debug(resp.data)
 
     chash = scrapertools.find_single_match(resp.data, "var chash\s*=\s*'([^']+)")
     def decode_puerto(t, e):
@@ -815,7 +810,7 @@ def _proxy_list_download(url, tipo_proxy, pais_proxy, max_proxies):
 
     # API: https://www.proxy-list.download/api/v1
     url_provider = 'https://www.proxy-list.download/api/v1/get'
-    url_provider += '?type=' + ('https' if url.startswith('https') else 'http') # http, https, socks4, socks5
+    url_provider += '?type=' + ('https' if url.startswith('https') else 'http')
     if tipo_proxy != '': url_provider += '&anon=' + tipo_proxy
     if pais_proxy != '': url_provider += '&country=' + pais_proxy
 
@@ -846,7 +841,6 @@ def _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies):
     url_provider = 'https://proxysource.org/en/freeproxies'
 
     resp = httptools.downloadpage(url_provider, raise_weberror=False)
-    # ~ logger.debug(resp.data)
 
     url_provider_day = scrapertools.find_single_match(resp.data, '</p><a href="(.*?)"')
 
@@ -857,7 +851,6 @@ def _proxysource_org(url, tipo_proxy, pais_proxy, max_proxies):
         url_provider_day = 'https://proxysource.org' + url_provider_day
 
     resp = httptools.downloadpage(url_provider_day, raise_weberror=False)
-    # ~ logger.debug(resp.data)
 
     block = scrapertools.find_single_match(resp.data, 'class="ant-input">(.*?)</textarea>')
 
@@ -886,7 +879,6 @@ def acumulaciones(provider, proxies, all_providers_proxies, max_proxies):
     return all_providers_proxies
 
 
-# Testear una lista de proxies para una url determinada
 def do_test_proxy(url, proxy, info):
     logger.info()
 
@@ -910,7 +902,7 @@ def testear_lista_proxies(provider, url, proxies=[]):
     logger.info()
 
     threads = []
-    proxies_info = {} # resultados de los tests
+    proxies_info = {}
 
     proceso_test = True
 
@@ -934,16 +926,27 @@ def testear_lista_proxies(provider, url, proxies=[]):
 
         if progreso.iscanceled():
             progreso.close()
-            return [] #break
+            return []
 
     if proceso_test:
         pendent = [a for a in threads if a.isAlive()]
+        maxValidos = config.get_setting('proxies_memory', default=5)
+
         while len(pendent) > 0:
             hechos = num_proxies - len(pendent)
             perc = int(hechos / num_proxies * 100)
             validos = sum([1 for proxy in proxies if proxies_info[proxy]['ok']])
 
             progreso.update(perc, 'Comprobando %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
+
+            if proxies_limit:
+                if validos >= maxValidos: break # valores 3,4,5,6,7,8,9
+
+                elif validos >= 10: break # si todos los 10 más rápidos
+                elif validos >= 3: break # los 3 más rápidos
+            else: 
+                if validos >= 3: break # los 3 más rápidos
+                elif validos >= 10: break # si todos los 10 más rápidos
 
             if progreso.iscanceled(): break
 
@@ -976,7 +979,6 @@ def configuracion_general():
     config.__settings__.openSettings()
 
     platformtools.itemlist_refresh()
-
 def obtener_private_list():
     logger.info()
 
@@ -1002,7 +1004,7 @@ def obtener_private_list():
             return proxies
 
     data = filetools.read(proxies_file)
-    data = re.sub(r'(?m)^#.*\n?', '', data) # Quitar líneas que empiezen por #
+    data = re.sub(r'(?m)^#.*\n?', '', data)
     proxies = data.replace(' ', '').replace(';', ',').replace(',', '\n').split()
 
     return proxies
