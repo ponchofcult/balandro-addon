@@ -7,6 +7,9 @@ from platformcode import config, logger, platformtools
 from core.item import Item
 from core import channeltools
 
+color_list_prefe = config.get_setting('channels_list_prefe_color', default='gold')
+color_list_proxies = config.get_setting('channels_list_proxies_color', default='red')
+color_list_inactive = config.get_setting('channels_list_inactive_color', default='gray')
 
 color_alert = config.get_setting('notification_alert_color', default='red')
 color_infor = config.get_setting('notification_infor_color', default='pink')
@@ -266,6 +269,7 @@ def do_search(item, tecleado):
     else:
         # Búsqueda parecida en todos los canales : link para acceder a todas las coincidencias y previsualización de n enlaces por canal
         no_results = config.get_setting('search_no_results', default=False)
+        no_results_proxies = config.get_setting('search_no_results_proxies', default=True)
 
         nro = 0
         color = 'chartreuse'
@@ -284,9 +288,16 @@ def do_search(item, tecleado):
                         if config.get_setting(cfg_proxies_channel, default=''):
                             titulo = titulo + ' [COLOR red]debe configurar nuevos proxies'
                     else:
-                        if no_channels:
-                            platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado sin resultados[/COLOR][/B]' % color_avis)
-                        continue
+                        if config.get_setting(cfg_proxies_channel, default=''):
+                            if no_results_proxies:
+                                titulo = ch['name'] + '[COLOR coral] sin resultados'
+                                titulo = titulo + ' [COLOR red]debe configurar nuevos proxies'
+                            else:
+                                continue
+                        else:
+                            if no_channels:
+                               platformtools.dialog_notification(ch['name'], '[B][COLOR %s]Ignorado sin resultados[/COLOR][/B]' % color_avis)
+                            continue
                 else:
                     action = 'search'
                     texto = 'resultados'
@@ -336,8 +347,27 @@ def do_search(item, tecleado):
                 itemlist.append(Item( action = '', title = tecleado + '[COLOR coral]sin resultados en ningún canal[/COLOR]' ))
                 break
 
+            context = []
+
+            if not 'debe configurar nuevos proxies' in titulo:
+                tit = '[COLOR %s]Marcar canal como Preferido[/COLOR]' % color_list_prefe
+                context.append({'title': tit, 'channel': 'actions', 'action': '_marcar_canales', 'estado': 1, 'canal': ch['id']})
+
+                tit = '[COLOR %s]Des-Marcar canal como Preferido[/COLOR]' % color_list_prefe
+                context.append({'title': tit, 'channel': 'actions', 'action': '_marcar_canales', 'estado': 0, 'canal': ch['id']})
+
+            tit = '[COLOR %s]Marcar canal como Desactivado[/COLOR]' % color_list_inactive
+            context.append({'title': tit, 'channel': 'actions', 'action': '_marcar_canales', 'estado': -1, 'canal': ch['id']})
+
+            tit = '[COLOR %s]Des-Marcar canal como Desactivado[/COLOR]' % color_list_inactive
+            context.append({'title': tit, 'channel': 'actions', 'action': '_marcar_canales', 'estado': 0, 'canal': ch['id']})
+
+            tit = '[COLOR white]Marcar canal como Activo[/COLOR]'
+            context.append({'title': tit, 'channel': 'actions', 'action': '_marcar_canales', 'estado': 0, 'canal': ch['id']})
+
             titulo = '[B][COLOR %s]%s[/COLOR][/B]' % (color, titulo)
-            itemlist.append(Item( channel=ch['id'], action=action, buscando=tecleado, title=titulo, thumbnail=ch['thumbnail'], search_type=item.search_type ))
+            itemlist.append(Item( channel=ch['id'], action=action, buscando=tecleado, title=titulo, context=context,
+                                                    thumbnail=ch['thumbnail'], search_type=item.search_type ))
 
             if 'itemlist_search' in ch:
                 for j, it in enumerate(ch['itemlist_search']):
@@ -360,3 +390,4 @@ def do_search(item, tecleado):
             platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Búsqueda sin resultados[/COLOR][/B]' % color_infor)
 
     return itemlist
+

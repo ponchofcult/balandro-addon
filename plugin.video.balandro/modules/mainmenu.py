@@ -393,6 +393,7 @@ def channels(item):
         if ch['status'] != 1:
             tit = '[COLOR %s]Marcar canal como Preferido[/COLOR]' % color_list_prefe
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 1})
+
         if ch['status'] != 0:
             if ch['status'] == 1:
                 tit = '[COLOR %s]Des-Marcar canal como Preferido[/COLOR]' % color_list_prefe
@@ -403,6 +404,7 @@ def channels(item):
             else:
                 tit = '[COLOR white]Marcar canal como Activo[/COLOR]'
                 context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': 0})
+
         if ch['status'] != -1:
             tit = '[COLOR %s]Marcar canal como Desactivado[/COLOR]' % color_list_inactive
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': -1})
@@ -554,10 +556,6 @@ def submnu_special(item):
     current_month = int(datetime.today().month)
 
     if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies':
-        if current_month == 11:
-            itemlist.append(Item( channel='tmdblists', action='descubre', title= 'Halloween', text_color='pink', extra = 27, search_type = 'movie',
-                                  thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
-
         itemlist.append(item.clone( title = 'Películas recomendadas:', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
 
         itemlist.append(Item( channel='clubcine', action='_besthistoria', title=' - Las mejores de la historia', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
@@ -569,6 +567,10 @@ def submnu_special(item):
         itemlist.append(Item( channel='clubcine', action='_bestcinedesiempre', title=' - Las mejores del cine de siempre', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
 
         itemlist.append(item.clone( title = 'Películas búsquedas a través de listas:', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
+
+        if current_month == 11:
+            itemlist.append(Item( channel='tmdblists', action='descubre', title= ' - Halloween', text_color='moccasin', extra = 27, search_type = 'movie',
+                                  thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
 
         itemlist.append(Item( channel='tmdblists', action='listado', title= ' - En cartelera', extra = 'now_playing', thumbnail=config.get_thumb('movie'), search_type = 'movie' ))
 

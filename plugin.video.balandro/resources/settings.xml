@@ -180,6 +180,7 @@
         <setting id="search_limit_by_channel" type="labelenum" values="1|2|3|4|5|6|7|8|9|10" label="Cuantos resultados desea previsualizar por cada canal" default="2"/>
 
         <setting type="sep"/>
+        <setting id="search_no_results_proxies" type="bool" label="Presentar en que canales deberá configurar nuevos proxies" default="true"/>
         <setting id="search_no_results" type="bool" label="Presentar los canales sin resultados" default="false"/>
         <setting id="search_no_channels" type="bool" label="Notificar los canales ignorados" default="false"/>
 

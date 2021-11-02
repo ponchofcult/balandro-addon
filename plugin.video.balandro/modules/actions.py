@@ -23,6 +23,34 @@ def open_settings(item):
     platformtools.itemlist_refresh()
 
 
+def _marcar_canales(item):
+    cfg_cchannel_status = 'channel_' + item.canal + '_status'
+    status = config.get_setting(cfg_cchannel_status, default='')
+
+    if status:
+        ant_tipo = 'Activo'
+        if status == 1: ant_tipo = 'Preferido'
+        if status == -1: ant_tipo = 'Desactivado'
+
+    new_tipo = 'Activo'
+    if item.estado == 1: new_tipo = 'Preferido'
+    if item.estado == -1: new_tipo = 'Desactivado'
+
+    if status:
+        if ant_tipo == new_tipo:
+            el_canal = ('Sin cambio en [B][COLOR %s] %s [COLOR %s] ' + item.canal.capitalize() + '[/COLOR][/B]') % (color_exec, new_tipo, color_infor)
+            platformtools.dialog_notification(config.__addon_name, el_canal)
+            return
+
+        if not platformtools.dialog_yesno(config.__addon_name + ' - ' + item.canal.capitalize(), '[COLOR red]¿ Confirma cambiar la personalización del canal ?[/COLOR]', 'de:  [COLOR cyan]' + ant_tipo + '[/COLOR]', 'a:    [COLOR yellow]' + new_tipo + '[/COLOR]'): 
+            return
+
+    config.set_setting('status', item.estado, item.canal)
+	
+    el_canal = ('Cambiado a [B][COLOR %s] %s [COLOR %s] ' + item.canal.capitalize() + '[/COLOR][/B]') % (color_exec, new_tipo, color_avis)
+    platformtools.dialog_notification(config.__addon_name, el_canal)
+
+
 def comprobar_nuevos_episodios(item):
     logger.info()
 
