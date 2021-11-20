@@ -156,6 +156,7 @@ def findvideos(item):
         servidor = corregir_servidor(scrapertools.find_single_match(match, '-dns">(.*?)</p>'))
 
         if servidor == 'damedamehoy': servidor = 'directo'
+        elif servidor == 'tomatomatela': servidor = 'directo'
 
         url = host + '?trembed=%s&trid=%s&trtype=1' % (data_key, data_id)
 
@@ -163,6 +164,18 @@ def findvideos(item):
                               language = IDIOMAS.get(lang, lang), quality = qlty ))
 
     return itemlist
+
+
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
 
 
 def play(item):
@@ -173,17 +186,12 @@ def play(item):
 
     url = scrapertools.find_single_match(data, 'src="([^"]+)"')
 
-    if '/damedamehoy.xyz/' in url:
-        url = url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-        data = httptools.downloadpage(url).data
-
-        url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-
-        url = url.replace('\\/', '/')
+    if '/damedamehoy.' in url or '//tomatomatela.' in url:
+        url = resuelve_dame_toma(url)
 
         if url:
-           itemlist.append(item.clone( url=url, server='directo'))
-           return itemlist
+            itemlist.append(item.clone(url=url , server='directo'))
+            return itemlist
 
     if '/flixplayer.' in url:
        data = httptools.downloadpage(url).data

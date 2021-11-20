@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -19,7 +19,15 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
 
 
 def mainlist(item):
-    return mainlist_pelis(item)
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
+    itemlist.append(item.clone( title = 'Series', action = 'mainlist_series' ))
+
+    itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
+
+    return itemlist
 
 
 def mainlist_pelis(item):
@@ -33,6 +41,17 @@ def mainlist_pelis(item):
     itemlist.append(item.clone ( title = 'Por año', action = 'anios', search_type = 'movie' ))
 
     itemlist.append(item.clone ( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
+
+    return itemlist
+
+
+def mainlist_series(item):
+    logger.info()
+    itemlist = []
+
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', search_type = 'tvshow' ))
+
+    itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
     return itemlist
 
@@ -100,6 +119,9 @@ def list_all(item):
         title = scrapertools.find_single_match(article, '<h2 class="entry-title">(.*?)</h2>')
         if not url or not title: continue
 
+        tipo = 'tvshow' if '/series/"' in url else 'movie'
+        sufijo = '' if item.search_type != 'all' else tipo
+
         thumb = scrapertools.find_single_match(article, ' src="([^"]+)"')
         if thumb.startswith('//'): thumb = 'https:' + thumb
 
@@ -113,8 +135,12 @@ def list_all(item):
         if '/Mexico.png' in article: langs.append('Lat')
         if '/United-States-Minor-Outlying.png' in article: langs.append('Vose')
 
-        itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs), 
-                                    contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        if '/movies/' in url:
+            itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs),
+                                        fmt_sufijo=sufijo,  contentType='movie', contentTitle=title, infoLabels={'year': year} ))
+        else:
+           itemlist.append(item.clone( action='temporadas', url=url, title=title, thumbnail=thumb, qualities=qlty, languages=', '.join(langs),
+                                       fmt_sufijo=sufijo, contentType='tvshow', contentSerieName=title, infoLabels={'year': year} ))
 
     tmdb.set_infoLabels(itemlist)
 
@@ -124,6 +150,73 @@ def list_all(item):
             if next_page:
                 if '/page/' in next_page:
                     itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral' ))
+
+    return itemlist
+
+
+def temporadas(item):
+    logger.info()
+    itemlist = []
+
+    data = do_downloadpage(item.url)
+
+    matches = scrapertools.find_multiple_matches(data, 'data-season="(.*?)"')
+
+    for season in matches:
+        title = 'Temporada ' + season
+
+        if len(matches) == 1:
+            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&'), 'solo [COLOR tan]' + title + '[/COLOR]')
+            item.page = 0
+            item.contentType = 'season'
+            item.contentSeason = season
+            itemlist = episodios(item)
+            return itemlist
+
+        itemlist.append(item.clone( action = 'episodios', title = title, contentType = 'season', contentSeason = season, page = 0 ))
+
+    tmdb.set_infoLabels(itemlist)
+
+    return itemlist
+
+
+def episodios(item):
+    logger.info()
+    itemlist=[]
+
+    if not item.page: item.page = 0
+    perpage = 50
+
+    data = do_downloadpage(item.url)
+
+    data_post = scrapertools.find_single_match(data, 'data-post="(.*?)"')
+
+    if not data_post: return itemlist
+
+    url = host + 'wp-admin/admin-ajax.php'
+
+    post = {'action': 'action_select_season', 'season': str(item.contentSeason), 'post': data_post}
+
+    data = do_downloadpage(url, post = post)
+
+    matches = scrapertools.find_multiple_matches(data, 'src="(.*?)".*?<span class="num-epi">(.*?)</span>.*?<a href="(.*?)"')
+
+    for thumb, season_episode, url in matches[item.page * perpage:]:
+        season = scrapertools.find_single_match(season_episode, '(.*?)x').strip()
+        episode = scrapertools.find_single_match(season_episode, 'x(.*?)$').strip()
+
+        if thumb.startswith('//'): thumb = 'https:' + thumb
+
+        titulo = '%sx%s %s' % (season, episode, item.contentSerieName)
+
+        itemlist.append(item.clone( action = 'findvideos', title = titulo, thumbnail = thumb, url = url,
+                                    contentType = 'episode', contentSeason = season, contentEpisodeNumber = episode ))
+
+        if len(itemlist) >= perpage:
+            break
+
+    if len(matches) > ((item.page + 1) * perpage):
+        itemlist.append(item.clone( title = ">> Página siguiente", action = "episodios", page = item.page + 1, text_color='coral' ))
 
     return itemlist
 

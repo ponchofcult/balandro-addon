@@ -24,8 +24,8 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None, follow_redirects=True, only_headers=False):
     # ~ por si viene de enlaces guardados
-    url = url.replace('http://www.cuevana3.co/', 'https://cuevana3.io/')
-    url = url.replace('https://cuevana3.co/', 'https://cuevana3.io/')
+    url = url.replace('http://www.cuevana3.co/', host)
+    url = url.replace('https://cuevana3.co/', host)
 
     # ~ resp = httptools.downloadpage(url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
     resp = httptools.downloadpage_proxy('cuevana3', url, post=post, headers=headers, follow_redirects=follow_redirects, only_headers=only_headers)
@@ -274,8 +274,8 @@ def findvideos(item):
 
     # Dejar desconocidos como directos
     for it in itemlist:
-        if it.server == 'desconocido' and ('//api.cuevana3' in it.url or '//damedamehoy.' in it.url):
-            it.server = 'fembed' if '/fembed/?' in it.url else 'directo' if '//damedamehoy.' in it.url else ''
+        if it.server == 'desconocido' and ('//api.cuevana3' in it.url or '//damedamehoy.' in it.url or '//tomatomatela.' in it.url):
+            it.server = 'fembed' if '/fembed/?' in it.url else 'directo' if '//damedamehoy.' in it.url or '//tomatomatela.' in it.url else ''
         elif it.server == 'desconocido' and 'openloadpremium.com/' in it.url:
             it.server = 'm3u8hls'
 
@@ -287,7 +287,7 @@ def findvideos(item):
     return itemlist
 
 
-def resuelve_damedamehoy(dame_url):
+def resuelve_dame_toma(dame_url):
     data = do_downloadpage(dame_url)
 
     url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
@@ -303,8 +303,8 @@ def play(item):
     logger.info()
     itemlist = []
 
-    if '//damedamehoy.' in item.url:
-        url = resuelve_damedamehoy(item.url)
+    if '//damedamehoy.' in item.url or '//tomatomatela.' in item.url:
+        url = resuelve_dame_toma(item.url)
         if url:
             itemlist.append(['mp4', url])
         return itemlist
@@ -352,11 +352,29 @@ def play(item):
 
             url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
 
+            if url.startswith('//'): url = 'https:' + url
+ 
+            if 'h=' in url:
+                fid = scrapertools.find_single_match(url, "h=([^&]+)")
+                if 'https://api.cuevana3.io/sc/index.php?h=' in url:
+                    api_url = 'https://api.cuevana3.io/sc/r.php'
+                    api_post = 'h=' + fid
+                elif 'https://api.cuevana3.io/ir/goto_ddh.php' in url:
+                    api_url = 'https://api.cuevana3.io/ir/redirect_ddh.php'
+                    api_post = 'url=' + fid
+                else:
+                    api_url = 'https://api.cuevana3.io/ir/rd.php'
+                    api_post = 'url=' + fid
+
+                url = do_downloadpage(api_url, post=api_post, headers={'Referer': item.url}, follow_redirects=False, only_headers=True).get('location', '')
+
+                if url.startswith('//'): url = 'https:' + url
+
             if '/hqq.' in url or '/waaw.' in url or '/netu.' in url or 'gounlimited' in url:
                 return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-            if '//damedamehoy.' in url:
-                url = resuelve_damedamehoy(url)
+            if '//damedamehoy.' in url or '//tomatomatela.' in url:
+                url = resuelve_dame_toma(url)
                 if url:
                     itemlist.append(['mp4', url])
             else:

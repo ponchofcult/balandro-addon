@@ -245,9 +245,8 @@ def play(item):
            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Enlace NO Soportado[/B][/COLOR]')
 
        if url:
-           if '\\/' in url:
-               url = url.replace('\\', '/')
-
+           url = url.replace('\\', '/').replace('\\/', '/')
+		   
            if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:
                return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
            elif 'openload' in url or 'powvideo' in url or 'streamplay' in url or 'rapidvideo' in url or 'streamango' in url or 'verystream' in url or 'vidtodo' in url:

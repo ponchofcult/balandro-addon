@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger, platformtools
+from platformcode import logger, config, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -212,8 +212,12 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, ' href="#options-(.*?)".*?class="server">(.*?)</span>')
 
+    ses = 0
+
     # enlaces
     for opt, server_idioma in matches:
+        ses += 1
+
         s_i = scrapertools.find_single_match(server_idioma, '(.*?)-(.*?)$')
         if not s_i: continue
 
@@ -227,8 +231,10 @@ def findvideos(item):
         if not url: url = scrapertools.find_single_match(bloque, '<div id="options-' + opt + '.*?<iframe data-src="(.*?)"')
         if not url: continue
 
-        itemlist.append(Item( channel = item.channel, action = 'play', server = normalize_server(servidor), title = '', url = url, 
-                              language = IDIOMAS.get(lang, lang), other = 'e' ))
+        servidor = normalize_server(servidor)
+		
+        itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = 'e',
+                              language = IDIOMAS.get(lang, lang) ))
 
     # descargas
     if '>Descargar Torrent<' in data:
@@ -237,6 +243,8 @@ def findvideos(item):
         matches = re.compile('<td><span class="num">(.*?)</tr>', re.DOTALL).findall(bloque)
 
         for match in matches:
+            ses += 1
+
             url = scrapertools.find_single_match(match, ' href="([^"]+)"')
             if url.startswith('//'): url = 'https:' + url
             if not url: continue
@@ -252,8 +260,15 @@ def findvideos(item):
                 other = 't'
                 servidor = ''
 
-            itemlist.append(Item( channel = item.channel, action = 'play', server = normalize_server(servidor), title = '', url = url,
-                                  language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) , other = other ))
+            servidor = normalize_server(servidor)
+
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = url, other = other,
+                                  language = IDIOMAS.get(lang, lang), quality = qlty, quality_num = puntuar_calidad(qlty) ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -271,14 +286,7 @@ def play(item):
             return itemlist
 
     if item.server == 'torrent':
-        import os
-        from platformcode import config
-
-        data = do_downloadpage(item.url)
-        file_local = os.path.join(config.get_data_path(), "temp.torrent")
-        with open(file_local, 'wb') as f: f.write(data); f.close()
-
-        itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        itemlist.append(item.clone( url = item.url, server = 'torrent' ))
         return itemlist
 
     elif item.other == 't':
@@ -288,16 +296,6 @@ def play(item):
             if url.endswith('.torrent'):
                itemlist.append(item.clone( url = url, server = 'torrent' ))
                return itemlist
-
-            import os
-            from platformcode import config
-
-            data = do_downloadpage(url)
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
-
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
-            return itemlist
 
     else:
         data = do_downloadpage(item.url)

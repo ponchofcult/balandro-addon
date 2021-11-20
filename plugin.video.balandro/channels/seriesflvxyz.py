@@ -164,7 +164,7 @@ def list_all(item):
     next_page = scrapertools.find_single_match(data, '<div class="pagination".*?<span class="current".*?href="([^"]+)"')
     if next_page:
        if '/page/' in next_page:
-           itemlist.append(item.clone (url = next_page, page = 0, title = '>> Página siguiente', action = 'list_all', text_color='coral' ))
+           itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'list_all', text_color='coral' ))
 
     return itemlist
 
@@ -201,7 +201,7 @@ def last_episodes(item):
     next_page = scrapertools.find_single_match(data, '<div class="pagination".*?<span class="current".*?href="([^"]+)"')
     if next_page:
        if '/page/' in next_page:
-           itemlist.append(item.clone (url = next_page, page = 0, title = '>> Página siguiente', action = 'last_episodes', text_color='coral' ))
+           itemlist.append(item.clone (url = next_page, title = '>> Página siguiente', action = 'last_episodes', text_color='coral' ))
 
     return itemlist
 

@@ -231,13 +231,11 @@ def play(item):
     url = scrapertools.find_single_match(data, '<a id="link".*?href="(.*?)"')
 
     if url.endswith('.torrent'):
-        import os
+        if 'url=' in url:
+            url = scrapertools.find_single_match(str(url), 'url=(.*?)$')
+            if not url.endswith('.torrent'): return itemlist
 
-        data = do_downloadpage(url)
-        file_local = os.path.join(config.get_data_path(), "temp.torrent")
-        with open(file_local, 'wb') as f: f.write(data); f.close()
-
-        itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        itemlist.append(item.clone( url = url, server = 'torrent' ))
 
     return itemlist
 

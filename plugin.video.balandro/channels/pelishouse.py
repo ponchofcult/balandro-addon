@@ -542,6 +542,18 @@ def detectar_idiomas(tags):
     return languages
 
 
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
+
+
 def play(item):
     logger.info()
     itemlist = []
@@ -599,12 +611,8 @@ def play(item):
            url = ''
 
         if url:
-            if '/damedamehoy.xyz/' in url:
-                url = url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-                data = httptools.downloadpage(url).data
-
-                url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-                url = url.replace('\\/', '/')
+            if '//damedamehoy.' in url or '//tomatomatela.' in url:
+                url = resuelve_dame_toma(url)
 
         if url:
             itemlist.append(item.clone( url=url, server='directo'))

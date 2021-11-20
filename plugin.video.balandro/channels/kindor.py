@@ -251,12 +251,13 @@ def findvideos(item):
         hash = scrapertools.find_single_match(data, "hash:'([^']+)'")
 
     for lang in json_data:
-        url = "%s?h=%s" % (base64.b64decode(json_data[lang]), hash)
+        url = base64.b64decode(json_data[lang])
 
         servidor = servertools.get_server_from_url(url)
         servidor = servertools.corregir_servidor(servidor)
 
-        url = servertools.normalize_url(servidor, url)
+        url = str(servertools.normalize_url(servidor, url))
+        url = "%s?h=%s" % (url, hash)
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, title = '', language = IDIOMAS.get(lang, lang) ))
 

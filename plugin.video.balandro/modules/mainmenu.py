@@ -34,6 +34,7 @@ channels_search_excluded_mixed = config.get_setting(cfg_search_excluded_mixed, d
 channels_search_excluded_all = config.get_setting(cfg_search_excluded_all, default='')
 
 current_year = int(datetime.today().year)
+current_month = int(datetime.today().month)
 
 
 def mainlist(item):
@@ -44,18 +45,28 @@ def mainlist(item):
 
     if config.get_setting('developer_mode', default=False):
         if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'developer.py')):
-            itemlist.append(Item( channel='developer', action='mainlist', title='Gestión opción géneros', thumbnail=config.get_thumb('genres'), text_color='yellow' ))
-        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
-            itemlist.append(Item( channel='test', action='mainlist', title='Tests canales y servidores', thumbnail=config.get_thumb('tools'), text_color='moccasin' ))
+            itemlist.append(Item( channel='developer', action='mainlist', title='Gestión opción géneros',
+                                  thumbnail=config.get_thumb('genres'), text_color='yellow' ))
 
-    current_month = int(datetime.today().month)
+        if os.path.exists(os.path.join(config.get_runtime_path(), 'modules', 'test.py')):
+            itemlist.append(Item( channel='test', action='mainlist', title='Tests canales y servidores',
+                                  thumbnail=config.get_thumb('tools'), text_color='moccasin' ))
 
     if current_month == 5:
         itemlist.append(Item( channel='filmaffinitylists', action='_oscars', title='Premios Oscar ' + str(current_year), text_color='pink',
                               thumbnail=config.get_thumb('oscars'), plot = 'Las películas nominadas a los premios Oscars' ))
+
     elif current_month == 10:
         itemlist.append(Item( channel='filmaffinitylists', action='_emmys', title='Premios Emmy ' + str(current_year), text_color='pink',
                               thumbnail=config.get_thumb('emmys'), plot = 'Las Series nominadas a los premios Emmy' ))
+
+    elif current_month == 11:
+         itemlist.append(Item( channel='tmdblists', action='descubre', title= 'Halloween', text_color='pink', extra = 27, search_type = 'movie',
+                               thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
+
+    else:
+        if config.get_setting('sub_mnu_special', default=True):
+            itemlist.append(item.clone( action='submnu_special', title='Especiales', extra='all', thumbnail=config.get_thumb('heart'), text_color='pink' ))
 
     context = []
     tit = '[COLOR %s]Global configurar proxies a usar[/COLOR]' % color_list_proxies
@@ -386,9 +397,10 @@ def channels(item):
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
-        if config.get_setting(cfg_proxies_channel, default=''):
-            tit = '[COLOR %s]Quitar los proxies del canal[/COLOR]' % color_list_proxies
-            context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_proxies'})
+        if 'proxies' in ch['notes'].lower():
+            if config.get_setting(cfg_proxies_channel, default=''):
+                tit = '[COLOR %s]Quitar los proxies del canal[/COLOR]' % color_list_proxies
+                context.append({'title': tit, 'channel': item.channel, 'action': '_quitar_proxies'})
 
         if ch['status'] != 1:
             tit = '[COLOR %s]Marcar canal como Preferido[/COLOR]' % color_list_prefe
@@ -410,11 +422,14 @@ def channels(item):
             context.append({'title': tit, 'channel': item.channel, 'action': '_marcar_canal', 'estado': -1})
 
         if 'dominios' in ch['notes'].lower():
+            tit = '[COLOR yellowgreen]Dominio vigente[/COLOR]'
+            context.append({'title': tit, 'channel': item.channel, 'action': '_dominio_vigente'})
+
             tit = '[COLOR %s]Configurar dominio a usar[/COLOR]' % color_adver
             context.append({'title': tit, 'channel': item.channel, 'action': '_dominios'})
 
         if 'register' in ch['clusters']:
-            tit = '[COLOR yellowgreen]Información para registrarse[/COLOR]'
+            tit = '[COLOR green]Información para registrarse[/COLOR]'
             context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_register'})
 
             tit = '[COLOR teal]Credenciales Cuenta[/COLOR]'
@@ -425,7 +440,7 @@ def channels(item):
                 tit = '[COLOR %s]Información proxies[/COLOR]' % color_infor
                 context.append({'title': tit, 'channel': 'helper', 'action': 'show_help_proxies'})
 
-            tit = '[COLOR %s]Cofigurar proxies a usar[/COLOR]' % color_list_proxies
+            tit = '[COLOR %s]Configurar proxies a usar[/COLOR]' % color_list_proxies
             context.append({'title': tit, 'channel': item.channel, 'action': '_proxies'})
 
             tit = '[COLOR %s]Refrescar caché menú[/COLOR]' % color_exec
@@ -553,8 +568,6 @@ def submnu_special(item):
     logger.info()
     itemlist = []
 
-    current_month = int(datetime.today().month)
-
     if item.extra == 'all' or item.extra == 'mixed' or item.extra == 'movies':
         itemlist.append(item.clone( title = 'Películas recomendadas:', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
 
@@ -567,10 +580,6 @@ def submnu_special(item):
         itemlist.append(Item( channel='clubcine', action='_bestcinedesiempre', title=' - Las mejores del cine de siempre', thumbnail=config.get_thumb('bestmovies'), search_type = 'movie' ))
 
         itemlist.append(item.clone( title = 'Películas búsquedas a través de listas:', thumbnail=config.get_thumb('movie'), action = '', text_color='pink' ))
-
-        if current_month == 11:
-            itemlist.append(Item( channel='tmdblists', action='descubre', title= ' - Halloween', text_color='moccasin', extra = 27, search_type = 'movie',
-                                  thumbnail=config.get_thumb('halloween'), plot = 'Películas del género Terror' ))
 
         itemlist.append(Item( channel='tmdblists', action='listado', title= ' - En cartelera', extra = 'now_playing', thumbnail=config.get_thumb('movie'), search_type = 'movie' ))
 
@@ -638,6 +647,13 @@ def _refresh_menu(item):
 def _quitar_proxies(item):
     from modules import submnuctext
     submnuctext._quitar_proxies(item)
+    return True
+
+def _dominio_vigente(item):
+    if item.from_channel == 'hdfull':
+        from modules import actions
+        actions.last_domain_hdfull(item)
+
     return True
 
 def _dominios(item):

@@ -7,34 +7,12 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://dontorrent.rs/'
+host = 'https://todotorrents.net/'
 
-
-def item_configurar_proxies(item):
-    plot = 'Es posible que para poder utilizar este canal necesites configurar algún proxy, ya que no es accesible desde algunos países/operadoras.'
-    plot += '[CR]Si desde un navegador web no te funciona el sitio ' + host + ' necesitarás un proxy.'
-    return item.clone( title = 'Configurar proxies a usar ...', action = 'configurar_proxies', folder=False, plot=plot, text_color='red' )
-
-def configurar_proxies(item):
-    from core import proxytools
-    return proxytools.configurar_proxies_canal(item.channel, host)
 
 
 def do_downloadpage(url, post=None, headers=None):
-    # ~ por si viene de enlaces guardados
-    url = url.replace('https://dontorrents.org/', host)
-    url = url.replace('https://dontorrents.net/', host)
-    url = url.replace('https://dontorrent.one/', host)
-    url = url.replace('https://dontorrent.app/', host)
-    url = url.replace('https://dontorrent.lol/', host)
-    url = url.replace('https://dontorrent.nz/', host)
-    url = url.replace('https://dontorrent.rip/', host)
-    url = url.replace('https://dontorrent.vip/', host)
-    url = url.replace('https://dontorrent.ws/', host)
-    url = url.replace('https://dontorrent.win/', host)
-
-    # ~ data = httptools.downloadpage(url, post=post).data
-    data = httptools.downloadpage_proxy('dontorrents', url, post=post, headers=headers).data
+    data = httptools.downloadpage(url, post=post).data
     return data
 
 
@@ -48,7 +26,6 @@ def mainlist(item):
 
     itemlist.append(item.clone( title = 'Buscar ...', action = 'search', search_type = 'all' ))
 
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -72,7 +49,6 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Buscar película ...', action = 'search', search_type = 'movie' ))
 
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 
@@ -90,7 +66,6 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow' ))
 
-    itemlist.append(item_configurar_proxies(item))
     return itemlist
 
 

@@ -109,7 +109,12 @@ def proxysearch_all(item):
                              continue
 
                    else:
-                        if not 'all' in ch['search_types']:
+                        if 'movie' in ch['search_types']: pass
+                        elif 'tvshow' in ch['search_types']: pass
+                        elif 'documentary' in ch['search_types']: pass
+                        elif 'torrent' in ch['categories']: pass
+                        elif 'all' in ch['search_types']: pass
+                        else:
                             continue
 
                # por NAME vensiones anteriores a 2.0
@@ -428,7 +433,7 @@ def proxysearch_channel(item, channel_id, channel_name):
         response = httptools.downloadpage(host, raise_weberror=False)
         if response.sucess == True:
             if len(response.data) > 999:
-                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_list_proxies
+                 el_canal = ('[B][COLOR %s]No necesita proxies ') % color_infor
                  el_canal += ('[COLOR %s]' + channel_name + '[/COLOR][/B]') % color_exec
                  platformtools.dialog_notification(config.__addon_name, el_canal)
                  return

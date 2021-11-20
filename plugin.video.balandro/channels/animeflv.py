@@ -7,9 +7,17 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www10.animeflv.cc/'
+host = 'https://www3.animeflv.cc/'
 
 perpage = 30
+
+
+def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    url = url.replace('/www10.animeflv.cc/', '/www3.animeflv.net/')
+
+    data = httptools.downloadpage(url, post=post).data
+    return data
 
 
 def mainlist(item):
@@ -60,7 +68,7 @@ def categorias(item):
 
     url_cat = url = host + 'browse'
 
-    data = httptools.downloadpage(url_cat).data
+    data = do_downloadpage(url_cat)
 
     matches = re.compile(r'<li class="tmp "><a><label class="radio"><input  type="radio" value="(\d+)" name="order" data-text="([^"]+)').findall(data)
 
@@ -79,7 +87,7 @@ def generos(item):
 
     url_genre = url = host + 'browse'
 
-    data = httptools.downloadpage(url_genre).data
+    data = do_downloadpage(url_genre)
 
     matches = re.compile(r'a><label><input  class="genre-ids" value="([^"]+)".*?type="checkbox">([^<]+)').findall(data)
 
@@ -114,8 +122,7 @@ def list_all(item):
 
     if not item.page: item.page = 0
 
-    data = httptools.downloadpage(item.url).data
-
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     patron = '<article class="Anime alt[^"]+"><a href="([^"]+)">'
@@ -160,11 +167,12 @@ def list_epis(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<h2>Últimos episodios</h2>(.*?)<h2>Últimos animes agregados</h2>')
 
-    patron = '<a href="(.*?)".*?<img src="(.*?)".*?<span class="Capi">(.*?)</span>.*?class="Title">(.*?)</strong>'
+    patron = '<li>.*?<a href="(.*?)".*?<img src="(.*?)".*?<span class="Capi">(.*?)</span>.*?class="Title">(.*?)</strong>'
 
     matches = re.compile(patron, re.DOTALL).findall(bloque)
 
@@ -190,7 +198,7 @@ def episodios(item):
 
     perpage = 50
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = re.compile('<li class="fa-play-circle"><a href="([^"]+)"><.*?this.src=\'([^\']+).*?<p>([^<]+)', re.DOTALL).findall(data)
@@ -234,18 +242,19 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    matches = re.compile(r'<li role="presentation" data-video="([^"]+)" title="([^"]+)">\s*<a href="[^"]+', re.DOTALL).findall(data)
+    matches = re.compile(r'<li role="presentation" data-video="([^"]+)" title="([^"]+)".*?<a href="[^"]+', re.DOTALL).findall(data)
 
     if not matches:
         new_url = scrapertools.find_single_match(data, '<ul class="ListCaps" id="episodeList".*?a href="(.*?)"')
         if new_url:
             if not new_url.startswith('http'):
                 new_url = host[:-1] + new_url
+                data = do_downloadpage(new_url)
 
-                data = httptools.downloadpage(new_url).data
-                matches = re.compile(r'<li role="presentation" data-video="([^"]+)" title="([^"]+)">\s*<a href="[^"]+', re.DOTALL).findall(data)
+                matches = re.compile(r'<li role="presentation" data-video="([^"]+)" title="([^"]+)".*?<a href="[^"]+', re.DOTALL).findall(data)
 
     ses = 0
 
@@ -278,13 +287,31 @@ def play(item):
     url = item.url
 
     if "/v/" in item.url:
-        data = httptools.downloadpage(item.url).data
+        data = do_downloadpage(item.url)
+
         if 'yandex.ru' in data:
             url = item.url.split('/v/')[0]
             item.url = item.url.replace(url, 'https://fembed.com')
             url = item.url
 
             servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
+            url = servertools.normalize_url(servidor, url)
+
+    if "/streaming.php?" in item.url:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, '<iframe id="embedvideo".*?</div>.*?src="(.*?)"')
+        if 'www.googletagmanager.com' in url: url = ''
+
+        if not url:
+            url = scrapertools.find_single_match(data, '<li class="linkserver".*?data-video="(.*?)"')
+
+        if url:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
+
             url = servertools.normalize_url(servidor, url)
 
     if '/hqq.' in url or '/waaw.' in url or '/netu.' in url:

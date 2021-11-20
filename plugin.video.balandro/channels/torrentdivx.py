@@ -2,7 +2,7 @@
 
 import re
 
-from platformcode import logger
+from platformcode import logger, config, platformtools
 from core.item import Item
 from core import httptools, scrapertools, tmdb, servertools
 
@@ -229,8 +229,8 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    IDIOMAS = {'Castellano':'Esp', 'Latino':'Lat', 'V.O. Subtitulado':'Vose', 'Version Original':'VO',
-                'Version Original +Sub': 'VOS', 'Latino - Varios': 'Varios'}
+    IDIOMAS = {'Castellano': 'Esp', 'Latino': 'Lat', 'V.O. Subtitulado': 'Vose', 'Version Original': 'VO',
+                'Subtitulo Español': 'Vose', 'Version Original +Sub': 'VOS', 'Latino - Varios': 'Varios'}
 
     data = do_downloadpage(item.url)
 
@@ -238,7 +238,11 @@ def findvideos(item):
 
     matches = scrapertools.find_multiple_matches(bloque, '<tr(.*?)</tr>')
 
+    ses = 0
+
     for enlace in matches:
+        ses += 1
+
         if '<th' in enlace or 'torrent' not in enlace: continue
         if "id='link-fake'" in enlace: continue
 
@@ -252,16 +256,21 @@ def findvideos(item):
         qlty = scrapertools.find_single_match(tds[1], "<strong class='quality'>([^<]+)")
         lang = tds[2]
 
-        othr = tds[3] if tds[3] != '----' else ''
-        if othr == 'No Aplica': othr = '?'
+        other = tds[3] if tds[3] != '----' else ''
+        if other == 'No Aplica': other = '?'
 
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'torrent', title = '', url = url,
-                              language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = othr ))
+                              language = IDIOMAS.get(lang,lang), quality = qlty, quality_num = puntuar_calidad(qlty), other = other ))
 
     if len(itemlist) == 0:
         matches = scrapertools.find_multiple_matches(data, ' href="(magnet[^"]+)')
         for url in matches:
             itemlist.append(Item( channel = item.channel, action = 'play', server = 'torrent', title = '', url = url ))
+
+    if not itemlist:
+        if not ses == 0:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
+            return
 
     return itemlist
 
@@ -275,18 +284,15 @@ def play(item):
 
         url = scrapertools.find_single_match(data, '<a id="link" rel="nofollow" href="([^"]+)')
 
-        if '/www.pastexts.com/' in url or '/tmearn.com/' in url or '/sturl.in/' in url or '/uiio.io/' in url or '/down.fast-' in url:
+        if '/www.pastexts' in url or '/tmearn' in url or '/sturl' in url or '/uii' in url or '/uiio' in url or '/down.fast-' in url or '/adshort' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if url.endswith('.torrent'):
-            import os
-            from platformcode import config
+        if url.startswith('magnet:'):
+            itemlist.append(item.clone( url = url, server = 'torrent' ))
+            return itemlist
 
-            data = do_downloadpage(url)
-            file_local = os.path.join(config.get_data_path(), "temp.torrent")
-            with open(file_local, 'wb') as f: f.write(data); f.close()
-
-            itemlist.append(item.clone( url = file_local, server = 'torrent' ))
+        elif url.endswith('.torrent'):
+            itemlist.append(item.clone( url = url, server = 'torrent' ))
             return itemlist
 
         if url:

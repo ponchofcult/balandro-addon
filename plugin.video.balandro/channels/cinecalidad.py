@@ -14,7 +14,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.cine-calidad.com/'
+host = 'https://cinecalidad.website/'
 
 
 def do_downloadpage(url, post=None, headers=None):
@@ -23,6 +23,7 @@ def do_downloadpage(url, post=None, headers=None):
     url = url.replace('https://www.cinecalidad.im/', host)
     url = url.replace('https://www.cinecalidad.is/', host)
     url = url.replace('https://www.cinecalidad.li/', host)
+    url = url.replace('https://www.cine-calidad.com/', host)
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
     return data
@@ -49,6 +50,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'En latino:', folder=False, text_color='plum' ))
     itemlist.append(item.clone( title = ' - Catálogo', action = 'list_all', url = host, search_type = 'movie' ))
+    itemlist.append(item.clone( title = ' - Estrenos', action = 'list_all', url = host + 'estrenos', search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - Más destacadas', action = 'destacadas', url = host, search_type = 'movie' ))
     itemlist.append(item.clone( title = ' - En 4K', action = 'list_all', url = host + '4k/', search_type = 'movie' ))
 
@@ -111,12 +113,16 @@ def anios(item):
     item.url = host + 'peliculas-por-ano/'
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
-    bloque = scrapertools.find_single_match(data, '<div class="yearlist">(.*?)</div>')
+    bloque = scrapertools.find_single_match(data, '>Peliculas por Año<(.*?)<aside class="sidebar">')
 
     matches = re.compile('<a href="(.*?)">(.*?)</a>', re.DOTALL).findall(bloque)
 
     for url, title in matches:
+        if '/index/' in url: continue
+        elif '/estrenos/' in url: continue
+
         url = urlparse.urljoin(item.url, url)
 
         itemlist.append(item.clone( title = title, action = 'list_all', url = url, search_type = 'movie' ))
@@ -140,10 +146,7 @@ def list_all(item):
     for match in matches:
         title = scrapertools.find_single_match(match, '<h2>(.*?)</h2>')
         if not title:
-            title = scrapertools.find_single_match(match, '<div class="in_title">(.*?)</div>')
-
-        plot = scrapertools.find_single_match(match, '<p>(.*?)</p>').strip()
-        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+            title = scrapertools.find_single_match(match, 'title="(.*?)"')
 
         url = scrapertools.find_single_match(match, '<a href="(.*?)"')
         if not url:
@@ -152,6 +155,9 @@ def list_all(item):
         url = url.replace('\\/', '/')
 
         if not url or not title: continue
+
+        plot = scrapertools.find_single_match(match, '<p>(.*?)</p>').strip()
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
 
         m = re.match(r"^(.*?)\((\d+)\)$", title)
         if m:

@@ -82,8 +82,10 @@ def mainlist(item):
         itemlist.append(item.clone( title = ' - Canales con Idiomas', action = 'ch_groups', group = 'languages', extra = 'movies' ))
         itemlist.append(item.clone( title = ' - Canales con Años', action = 'ch_groups', group = 'years', extra = 'movies' ))
         itemlist.append(item.clone( title = ' - Canales con Épocas', action = 'ch_groups', group = 'epochs', extra = 'movies' ))
-        itemlist.append(item.clone( title = ' - Canales con Países', action = 'ch_groups', group = 'countries', extra = 'movies' ))
         itemlist.append(item.clone( title = ' - Canales con Calidades', action = 'ch_groups', group = 'qualityes', extra = 'movies' ))
+
+        itemlist.append(item.clone( title = 'Películas o Series:', action = '', thumbnail=config.get_thumb('movie'), text_color='salmon' ))
+        itemlist.append(item.clone( title = ' - Canales con Países', action = 'ch_groups', group = 'countries', extra = 'movies' ))
 
         itemlist.append(item.clone( title = 'Documentales:', action = '', thumbnail=config.get_thumb('documentary'), text_color='limegreen' ))
         itemlist.append(item.clone( title = ' - Canales con temática Documental', action = 'ch_groups', group = 'docs' ))

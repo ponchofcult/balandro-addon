@@ -16,7 +16,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://atomixhq.com/'
+host = 'https://atomixhq.one/'
 
 clon_name = 'Atomix'
 
@@ -26,7 +26,7 @@ color_list_proxies = config.get_setting('channels_list_proxies_color', default='
 
 
 CLONES = [
-   ['atomix', 'https://atomixhq.com/', 'movie, tvshow', 'atomixhq.png'],
+   ['atomix', 'https://atomixhq.one/', 'movie, tvshow', 'atomixhq.png'],
    ['descargas2020', 'https://descargas2020.net/', 'movie', 'descargas2020.jpg']
    ]
 
@@ -52,11 +52,12 @@ def configurar_proxies(item):
 
 def do_downloadpage(item, url, post=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/pctmix.com/', '/atomixhq.com/')
-    url = url.replace('/pctmix1.com/', '/atomixhq.com/')
-    url = url.replace('/pctreload.com/', '/atomixhq.com/')
-    url = url.replace('/pctreload1.com/', '/atomixhq.com/')
-    url = url.replace('/maxitorrent.com/', '/atomixhq.com/')
+    url = url.replace('https://pctmix.com/', host)
+    url = url.replace('https://pctmix1.com/', host)
+    url = url.replace('https://pctreload.com/', host)
+    url = url.replace('https://pctreload1.com/', host)
+    url = url.replace('https://maxitorrent.com/', host)
+    url = url.replace('https://atomixhq.com/', host)
 
     # ~ intento sin proxies
     data = ''
@@ -427,7 +428,8 @@ def findvideos(item):
     for servidor, idioma, calidad, url, tipo in matches:
         if url.startswith('javascript:'): continue
 
-        servidor = servidor.replace('.com', '').strip()
+        servidor = servidor.replace('.com', '').replace('.net', '').replace('.org', '').replace('.co', '').replace('.cc', '').strip()
+        servidor = servidor.replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '').replace('.eu', '').replace('.ws', '').strip()
         servidor = servertools.corregir_servidor(servidor)
 
         if not idioma:
@@ -447,7 +449,8 @@ def findvideos(item):
         for servidor, idioma, calidad, url in matches:
             if url.startswith('javascript:'): continue
 
-            servidor = servidor.replace('.com', '').strip()
+            servidor = servidor.replace('.com', '').replace('.net', '').replace('.org', '').replace('.co', '').replace('.cc', '').strip()
+            servidor = servidor.replace('.to', '').replace('.tv', '').replace('.ru', '').replace('.io', '').replace('.eu', '').replace('.ws', '').strip()
             servidor = servertools.corregir_servidor(servidor)
 
             if not idioma:
@@ -468,31 +471,16 @@ def play(item):
         if '/atomtt.com/' in item.url:
             item.url = item.url.replace('/download/', '/download-link/').replace('.torrent', '')
 
-            if config.get_setting('proxies', item.channel, default=''):
-                data = do_downloadpage(item, item.url)
-
-                file_local = os.path.join(config.get_data_path(), "temp.torrent")
-                if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
-                with open(file_local, 'wb') as f: f.write(data); f.close()
-                itemlist.append(item.clone( url = file_local, server = 'torrent' ))
-            else:
-                itemlist.append(item.clone( url = item.url, server = 'torrent' ))
-
+            itemlist.append(item.clone( url = item.url, server = 'torrent' ))
         else:
             data = do_downloadpage(item, item.url)
 
             new_url = scrapertools.find_single_match(data, 'window.location.href.*?"(.*?)"')
             if new_url:
-                if config.get_setting('proxies', item.channel, default=''):
-                    data = do_downloadpage(item, new_url)
-
-                    file_local = os.path.join(config.get_data_path(), "temp.torrent")
-                    if PY3 and not isinstance(file_local, bytes): file_local = file_local.encode('utf-8')
-                    with open(file_local, 'wb') as f: f.write(data); f.close()
-                    itemlist.append(item.clone( url = file_local, server = 'torrent' ))
-                else:
-                    itemlist.append(item.clone( url = new_url, server = 'torrent' ))
-
+                itemlist.append(item.clone( url = new_url, server = 'torrent' ))
+            else:
+                itemlist.append(item.clone( url = item.url, server = 'torrent' ))
+           
     else:
         itemlist.append(item.clone( url= item.url, server = item.server ))
 

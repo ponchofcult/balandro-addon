@@ -124,6 +124,7 @@ def findvideos(item):
 
     for url, idioma in matches:
         if 'Latino' in idioma: lang = 'Lat'
+        elif 'Español' in idioma: lang = 'Esp'
         elif 'Subtitulado' in idioma: lang = 'Vose'
         else:
            lang = idioma
@@ -133,6 +134,18 @@ def findvideos(item):
         itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = lang ))
 
     return itemlist
+
+
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
 
 
 def play(item):
@@ -148,12 +161,12 @@ def play(item):
         if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
             return 'Requiere verificación [COLOR red]reCAPTCHA[/COLOR]'
 
-        if '/damedamehoy.xyz/' in url:
-            url = url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-            data = httptools.downloadpage(url).data
+        if '/damedamehoy.' in url or '//tomatomatela.' in url:
+            url = resuelve_dame_toma(url)
 
-            url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-            url = url.replace('\\/', '/')
+            if url:
+                itemlist.append(item.clone(url=url , server='directo'))
+                return itemlist
 
         elif "peliscloud" in url:
             dom = '/'.join(url.split('/')[:3])
@@ -174,7 +187,8 @@ def play(item):
         elif servidor == 'zplayer':
             url += '|%s' % item.url
 
-        itemlist.append(item.clone(server = servidor, url = url))
+        if url:
+            itemlist.append(item.clone(server = servidor, url = url))
 
     return itemlist
 

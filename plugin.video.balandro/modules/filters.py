@@ -680,26 +680,42 @@ def channels_excluded(item):
     if channels_search:
         channels_orden = []
 
-        i = 0
+        exclusiones = False
+
         for ch in ch_list:
+            if ch['searchable'] == False: continue
+
+            if item.extra == 'mixed':
+                tipos = ch['search_types']
+                if 'documentary' in tipos: continue
+
             channels_orden.append(ch['id'])
-            i += 1
 
         channels_preselct = str(channels_search).replace('[', '').replace(']', ',')
 
         matches = scrapertools.find_multiple_matches(channels_preselct, "(.*?), '(.*?)',")
-        for ch_nro, ch_name in matches:
-            if not ch_name in channels_orden[int(ch_nro)]:
-                tex1 = '[COLOR plum]El orden de la lista de los canales ha variado respecto a su lista anterior (Preferidos, Desactivados, Inactivos ó Anulados).[/COLOR]'
+
+        if matches:
+            for ch_nro, ch_name in matches:
+                ord_nro = 0
+
+                for ch in channels_orden:
+                    if ch_name == ch:
+                        if ch_name in str(preselect): break
+
+                        exclusiones = True
+                        preselect.append(ord_nro)
+                        break
+
+                    ord_nro += 1
+
+            if not exclusiones:
+                tex1 = '[COLOR plum]El orden de la lista de canales ha variado respecto a su lista anterior (Preferidos, Desactivados, Inactivos ó Anulados).[/COLOR]'
                 tex2 = '[COLOR cyan][B]Deberá seleccionar de nuevo los canales a excluir deseados.[/B][/COLOR]'
-                tex3 = '[COLOR red]Porque se eliminan los canales memorizados para excluirlos de [COLOR yellow] Configurar proxies a usar [/COLOR]'
+                tex3 = '[COLOR red]Porque se eliminarán los canales memorizados para excluirlos en las búsquedas[/COLOR]'
                 platformtools.dialog_ok(config.__addon_name, tex1, tex2, tex3)
                 config.set_setting(cfg_excludes, '')
                 preselect = []
-                break
-
-            ch_nro = ch_nro.strip()
-            preselect.append(int(ch_nro))
 
     i = 0
     for ch in ch_list:
@@ -725,7 +741,7 @@ def channels_excluded(item):
         if channels_search:
             channels_preselct = str(channels_search).replace('[', '').replace(']', ',')
             if ("'" + ch['id'] + "'") in str(channels_preselct):
-                info = info + '[COLOR white][B]EXCLUIDO [/B][/COLOR]'
+                info = info + '[COLOR violet][B]EXCLUIDO [/B][/COLOR]'
 
         if ch['status'] == 1:
             info = info + '[B][COLOR %s][I] Preferido [/I][/B][/COLOR]' % color_list_prefe
@@ -856,6 +872,23 @@ def channels_excluded_list(ret, channels_ids, channels_search):
             if ch_sel == i_id: seleccionados.append(channel_id)
             i_id += 1
 
+    if not seleccionados:
+        if len(channels_ids) > len(ret):
+            i_id = 0
+            len_ret = len(ret)
+
+            for channel_id in channels_ids:
+                if i_id < len_ret:
+                    i_id += 1
+                    continue
+
+                ord_nro = str(i_id).replace('[', '').replace(']', '').strip()
+
+                seleccionados.append(ord_nro)
+                seleccionados.append(channel_id + ',')
+
+                i_id += 1
+
     return seleccionados
 
 
@@ -983,7 +1016,7 @@ def show_channels_list(item):
         ch_list_t = channeltools.get_channels_list(filtros=filtros)
         ch_list = ch_list_f + ch_list_t
 
-        ch_list.sort(key=lambda ch: ch['id']) #.lower().strip()
+        ch_list.sort(key=lambda ch: ch['id'])
 
     else:
         if item.no_active == True or item.temp_no_active == True:
@@ -1008,6 +1041,8 @@ def show_channels_list(item):
             if not 'temporary' in ch['clusters']: continue
         elif item.no_active:
             if 'temporary' in ch['clusters']: continue
+        elif item.var_domains:
+            if not 'dominios' in ch['notes'].lower(): continue
 
         cfg_proxies_channel = 'channel_' + ch['id'] + '_proxies'
 
@@ -1081,6 +1116,8 @@ def show_channels_list(item):
             cabecera = 'Canales [COLOR yellow]Inestables[/COLOR]'
         elif item.cta_register == True:
             cabecera = 'Canales [COLOR yellow]con Cuenta[/COLOR]'
+        elif item.var_domains == True:
+            cabecera = 'Canales [COLOR yellow]con varios Dominios[/COLOR]'
         else:
             cabecera = 'Canales [COLOR yellow]Disponibles[/COLOR]'
 

@@ -11,6 +11,9 @@ host = 'https://pasateatorrent.net/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
+    if not headers:
+        headers = {'Referer': host}
+
     if '/categoria/' in url:
         raise_weberror = False
 
@@ -112,7 +115,7 @@ def calidades(item):
 
     itemlist.append(item.clone( title='En 4K', url=host + 'categoria/4k-2/', action='list_all' ))
     itemlist.append(item.clone( title='En BluRay', url=host + 'categoria/BluRay-1080p/', action='list_all' ))
-    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='' ))
+    itemlist.append(item.clone( title='En Dvd Rip', url=host + 'categoria/dvdrip/', action='list_all' ))
     itemlist.append(item.clone( title='En HD Rip', url=host + 'categoria/HDRip-2/', action='list_all' ))
     itemlist.append(item.clone( title='En Micro HD', url=host + 'categoria/MicroHD-1080p/', action='list_all' ))
     itemlist.append(item.clone( title='En 3D', url=host + 'categoria/3D/', action='list_all' ))
@@ -132,12 +135,13 @@ def list_all(item):
 
     for match in matches:
         url = scrapertools.find_single_match(match, " href='(.*?)'")
-
         if not url:
             url = scrapertools.find_single_match(match, ' href="(.*?)"')
 
-        title = scrapertools.find_single_match(match, '<div class="title">(.*?)</div>')
-        title = title.replace('<h2 style="font-size:20px;">', '').replace('</h2>', '').strip()
+        title = scrapertools.find_single_match(match, "alt='(.*?)'")
+        if not title:
+            title = scrapertools.find_single_match(match, '<div class="title">(.*?)</div>')
+            title = title.replace('<h2 style="font-size:20px;">', '').replace('</h2>', '').strip()
 
         if not url or not title: continue
 
@@ -170,7 +174,6 @@ def list_all(item):
         if '/series/' in url:
             if item.search_type != 'all':
                 if item.search_type == 'movie': continue
-
 
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, languages = lang, qualities=qlty, fmt_sufijo=sufijo,
                                         contentType = 'tvshow', contentSerieName = title, infoLabels={'year': year} ))
@@ -224,6 +227,7 @@ def findvideos(item):
         peso = peso.strip()
 
         other = peso + ' ' + episodio + ' ' + password
+        other = other.strip()
 
         itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, other = other ))
 

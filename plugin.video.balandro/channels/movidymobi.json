@@ -13,5 +13,5 @@
 
   "clusters": ["rankings", "years", "docs"],
 
-  "notes": "Películas: novedades, por géneros. Series: últimos episodios, por género."
+  "notes": "Películas por géneros."
 }

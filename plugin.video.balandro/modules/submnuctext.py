@@ -134,6 +134,11 @@ def _proxies(item):
         item.channel = 'mejortorrents'
         mejortorrents.configurar_proxies(item)
 
+    elif item.from_channel == 'movidytv':
+        from channels import movidytv
+        item.channel = 'movidytv'
+        movidytv.configurar_proxies(item)
+
     elif item.from_channel == 'newpct1':
         platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Configurar proxies desde el canal[/COLOR][/B]' % color_avis)
 
@@ -151,6 +156,16 @@ def _proxies(item):
         from channels import pelishouse
         item.channel = 'pelishouse'
         pelishouse.configurar_proxies(item)
+
+    elif item.from_channel == 'pelispedia':
+        from channels import pelispedia
+        item.channel = 'pelispedia'
+        pelispedia.configurar_proxies(item)
+
+    elif item.from_channel == 'pelispedia2':
+        from channels import pelispedia2
+        item.channel = 'pelispedia2'
+        pelispedia2.configurar_proxies(item)
 
     elif item.from_channel == 'pelisplanet':
         from channels import pelisplanet
@@ -176,6 +191,11 @@ def _proxies(item):
         from channels import ppeliculas
         item.channel = 'ppeliculas'
         ppeliculas.configurar_proxies(item)
+
+    elif item.from_channel == 'repelishd':
+        from channels import repelishd
+        item.channel = 'repelishd'
+        repelishd.configurar_proxies(item)
 
     elif item.from_channel == 'seriesflix':
         from channels import seriesflix

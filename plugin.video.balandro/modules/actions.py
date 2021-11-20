@@ -244,6 +244,37 @@ def manto_proxies(item):
        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]Proxies eliminados[/B][/COLOR]' % color_infor)
 
 
+def last_domain_hdfull(item):
+    logger.info()
+
+    from core import httptools, scrapertools
+
+    try:
+       data = httptools.downloadpage('https://hdfullcdn.cc/login').data
+       last_domain = scrapertools.find_single_match(data, 'location.replace.*?"(.*?)"')
+       if last_domain:
+           last_domain = last_domain.replace('login', '')
+           if not last_domain.endswith('/'):
+               last_domain = last_domain + '/'
+    except:
+      last_domain = ''
+
+    if not last_domain:
+        platformtools.dialog_notification(config.__addon_name, '[B][COLOR %s]No se pudo comprobar[/B][/COLOR]' % color_alert)
+        return
+
+    domain = config.get_setting('dominio', 'hdfull', default='')
+
+    if domain == last_domain:
+        platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]El último dominio vigente es correcto.', '[COLOR cyan][B]' + last_domain + '[/B][/COLOR]')
+        return
+
+    if platformtools.dialog_yesno(config.__addon_name + ' - HdFull', '¿ [COLOR red] Último dominio memorizado incorrecto. [/COLOR] Desea cambiarlo  ?','Memorizado:  [COLOR yellow][B]' + domain + '[/B][/COLOR]', 'Vigente:           [COLOR cyan][B]' + last_domain + '[/B][/COLOR]'): 
+        config.set_setting('dominio', last_domain, 'hdfull')
+
+        if not item.from_action == 'mainlist':
+            platformtools.dialog_ok(config.__addon_name + ' - HdFull', '[COLOR yellow]Ultimo dominio vigente memorizado, pero aún NO guardado.', '[COLOR cyan][B]Recuerde, que para que el cambio surta efecto deberá abandonar la configuración/ajustes de Balandro a través de su correspondiente botón --> OK[/B][/COLOR]')
+
 def del_datos_hdfull(item):
     logger.info()
 
@@ -258,6 +289,7 @@ def del_datos_hdfull(item):
         config.set_setting('channel_hdfull_hdfull_password', '')
         config.set_setting('channel_hdfull_hdfull_username', '')
 
+
 def del_datos_playdede(item):
     logger.info()
 
@@ -271,6 +303,7 @@ def del_datos_playdede(item):
         config.set_setting('channel_playdede_playdede_login', False)
         config.set_setting('channel_playdede_playdede_password', '')
         config.set_setting('channel_playdede_playdede_username', '')
+
 
 def manto_params(item):
     logger.info()

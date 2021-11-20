@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www.subtorrents.nz/'
+host = 'https://www.subtorrents.in/'
 
 perpage = 30
 
@@ -24,8 +24,9 @@ def configurar_proxies(item):
 
 def do_downloadpage(url, post=None, headers=None):
     # ~ por si viene de enlaces guardados
-    url = url.replace('/www.subtorrents.nl/', '/www.subtorrents.nz/')
-    url = url.replace('/www.subtorrents.ch/', '/www.subtorrents.nz/')
+    url = url.replace('https://www.subtorrents.nl/', host)
+    url = url.replace('https://www.subtorrents.ch/', host)
+    url = url.replace('https://www.subtorrents.nz/', host)
 
     data = httptools.downloadpage_proxy('subtorrents', url, post=post, headers=headers).data
     # ~ data = httptools.downloadpage(url, post=post, headers=headers).data

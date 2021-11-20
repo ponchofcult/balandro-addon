@@ -65,6 +65,7 @@ def mainlist(item):
     itemlist.append(item.clone( action='channels_no_actives', title= ' - Qué canales tiene marcados como desactivados', folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inestables', no_stable = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales requieren cuenta', cta_register = True, folder=False, thumbnail=config.get_thumb('stack') ))
+    itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales tiene varios dominios', var_domains = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están temporalmente inactivos', temp_no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
     itemlist.append(item.clone( action='show_channels_list', title= ' - Qué canales están inactivos', no_active = True, folder=False, thumbnail=config.get_thumb('stack') ))
 

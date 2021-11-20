@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://yestorrent.cx/'
+host = 'https://mejortorrent.la/'
 
 patron_domain = '(?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?(?:[^\.]+\.)?([\w|\-]+\.\w+)(?:\/|\?|$)'
 patron_host = '((?:http.*\:)?\/\/(?:.*ww[^\.]*)?\.?(?:[^\.]+\.)?[\w|\-]+\.\w+)(?:\/|\?|$)'
@@ -46,7 +46,7 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'descargar-peliculas-completas-y002/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'descargar-peliculas-completas/', search_type = 'movie' ))
 
     itemlist.append(item.clone( title = 'Por idioma', action = 'idiomas', search_type = 'movie' ))
     itemlist.append(item.clone( title = 'Por género', action = 'generos', search_type = 'movie' ))
@@ -344,10 +344,8 @@ def play(item):
             return itemlist
 
         if 'mega' in item.other:
-            url = item.url.replace('/file/', '/embed#!')
-
             try:
-                url_id = url.split('#')[1]
+                url_id = item_url.split('#')[1]
                 file_id = url_id.split('!')[1]
             except:
                 file_id = ''
@@ -356,7 +354,7 @@ def play(item):
                 get = ''
                 post = {'a': 'g', 'g': 1, 'p': file_id}
 
-                if '/#F!' in url:
+                if '/#F!' in page_url:
                     get = '&n=' + file_id
                     post = {'a': 'f', 'c': 1, 'r': 0}
  
@@ -367,11 +365,7 @@ def play(item):
                 api = 'https://g.api.mega.co.nz/cs?id=%d%s' % (nro, get)
                 resp = httptools.downloadpage(api, post=jsontools.dump([post]), headers={'Referer': 'https://mega.nz/'})
 
-                url = scrapertools.find_single_match(resp.data, '.*?"g":"(.*?)"')
-                if url:
-                    if url.endswith(".torrent"):
-                        itemlist.append(item.clone( url = url, server = 'torrent' ))
-                    return itemlist
+                logger.info("check-00-quehay: %s" % resp.data)
 
         servidor = servertools.get_server_from_url(item.url)
         servidor = servertools.corregir_servidor(servidor)

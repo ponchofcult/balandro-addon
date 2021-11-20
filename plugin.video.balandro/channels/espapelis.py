@@ -7,7 +7,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://movidy.mobi/'
+host = 'https://www.espapelis.com/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
@@ -44,12 +44,16 @@ def generos(item):
     itemlist=[]
 
     generos = [
+       'accion',
+       'animacion',
        'aventura',
+       'biografia',
        'comedia',
        'crimen',
        'documental',
        'drama',
        'familia',
+       'guerra',
        'historia',
        'misterio',
        'romance',
@@ -73,7 +77,7 @@ def anios(item):
     from datetime import datetime
     current_year = int(datetime.today().year)
 
-    for x in range(current_year, 1979, -1):
+    for x in range(current_year, 1978, -1):
         url = host + 'peliculas/fecha/' + str(x) + '/'
 
         itemlist.append(item.clone( title = str(x), url = url, action='list_all', page = 1 ))
@@ -115,7 +119,7 @@ def list_all(item):
             if '"load-more-ajax"' in data:
                url = host + 'wp-admin/admin-ajax.php'
                next_page = item.page + 1
-               post = {'action': 'action_load_pagination_home', 'number': 20, 'paged': next_page, 'postype': 'movie'}
+               post = {'action': 'action_load_pagination_home', 'number': 18, 'paged': next_page, 'postype': 'movie'}
 
                itemlist.append(item.clone( title = '>> Página siguiente', url = url, post = post, action = 'list_all', page = next_page, text_color='coral' ))
 
@@ -127,6 +131,7 @@ def findvideos(item):
     itemlist=[]
 
     data = do_downloadpage(item.url)
+    data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, '<li data-playerid="(.*?)".*?/flags/(.*?).png.*?<span style.*?>(.*?)</span>')
 
@@ -145,13 +150,46 @@ def findvideos(item):
         elif lang == 'la': lang = 'Lat'
         elif lang == 'mx': lang = 'Lat'
 
-        servidor = servertools.get_server_from_url(url)
-        servidor = servertools.corregir_servidor(servidor)
+        if '//mega.' in url:
+            servidor = 'mega'
+            if '/embed#!#!' in url: url = url.replace('/embed#!#!', '/embed#!')
+        else:
+            servidor = servertools.get_server_from_url(url)
+            servidor = servertools.corregir_servidor(servidor)
 
         url = servertools.normalize_url(servidor, url)
 
         itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url,
                         language = lang, quality = qlty ))
+
+    # Descargas
+    matches = scrapertools.find_multiple_matches(data, '<span class="num">#.*?</span>(.*?)</td><td>(.*?)</td><td><span>(.*?)</span>.*?href="(.*?)"')
+
+    for srv, lang, qlty, url in matches:
+        ses += 1
+
+        srv = srv.replace('.net', '').replace('.com', '').replace('.nz', '').replace('.to', '').strip().lower()
+
+        if srv == 'turbobit': continue
+        elif srv == '1fichier': continue
+
+        if lang == 'Castellano': lang = 'Esp'
+        elif lang == 'Latino': lang = 'Lat'
+
+        if srv == 'bittorrent': servidor = 'torrent'
+        elif srv == 'mega': servidor = 'mega'
+        else:
+           servidor = servertools.get_server_from_url(url)
+           servidor = servertools.corregir_servidor(servidor)
+
+           url = servertools.normalize_url(servidor, url)
+
+        other = 'D'
+        if not srv == servidor:
+            other = srv + ' d'
+
+        itemlist.append(Item(channel = item.channel, action = 'play', title = '', server = servidor, url = url,
+                        language = lang, quality = qlty, other = other))
 
     itemlist = servertools.get_servers_itemlist(itemlist)
 
@@ -159,6 +197,34 @@ def findvideos(item):
         if not ses == 0:
             platformtools.dialog_notification(config.__addon_name, '[COLOR tan][B]Sin enlaces Soportados[/B][/COLOR]')
             return
+
+    return itemlist
+
+
+def play(item):
+    logger.info()
+    itemlist = []
+
+    if 'D' in item.other:
+        data = do_downloadpage(item.url)
+
+        url = scrapertools.find_single_match(data, 'url=(.*?)"')
+
+        if not url:
+            new_url = scrapertools.find_single_match(data, 'href="(.*?)"')
+            if new_url:
+               if '/short/' in new_url:
+                   data = do_downloadpage(new_url)
+                   url = scrapertools.find_single_match(data, 'url=(.*?)"')
+
+        if url:
+            if '/%23!' in url:
+                url = url.replace('/%23!%23!', '/#!').replace('/%23!', '/#!')
+
+            itemlist.append(item.clone( url = url, server = item.server ))
+
+    else:
+        itemlist.append(item.clone( url = item.url, server = item.server ))
 
     return itemlist
 

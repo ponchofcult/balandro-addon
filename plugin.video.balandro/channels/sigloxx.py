@@ -53,8 +53,7 @@ def anios(item):
     logger.info()
     itemlist = []
 
-    url = host
-    data = httptools.downloadpage(url).data
+    data = httptools.downloadpage(host).data
 
     bloque = scrapertools.find_single_match(data, '>Décadas<(.*?)>Biografías<')
 

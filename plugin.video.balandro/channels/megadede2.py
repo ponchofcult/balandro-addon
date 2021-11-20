@@ -410,8 +410,10 @@ def play(item):
 
     item.url = item.url.replace('&amp;#038;', '&').replace('&#038;', '&').replace('&amp;', '&')
 
+    headers = {'Referer': item.url}
+
     if item.other == 'd':
-        url = httptools.downloadpage(item.url, follow_redirects=False).headers.get('location', '')
+        url = httptools.downloadpage(item.url, headers=headers, follow_redirects=False).headers.get('location', '')
 
         if url:
             url = url.replace('uptobox', 'uptostream')
@@ -424,13 +426,13 @@ def play(item):
         return itemlist
 
     elif item.other == 'dop':
-        data = do_downloadpage(item.url)
+        data = do_downloadpage(item.url, headers=headers)
 
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
         if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
 
         if '/validaEnlace' in url:
-            url = httptools.downloadpage(url, timeout = 30, follow_redirects=False).headers.get('location', '')
+            url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
             if url == 'https://streamplusvip.xyz': url = ''
 
         if '/hqq.' in url or '/waaw.' in url or '/netu' in url:
@@ -443,13 +445,13 @@ def play(item):
 
         return itemlist
 
-    data = do_downloadpage(item.url)
+    data = do_downloadpage(item.url, headers=headers)
 
     url = scrapertools.find_single_match(data, '<div class="Video">.*?src="(.*?)"')
     if not url: url = scrapertools.find_single_match(data, '<IFRAME.*?SRC="(.*?)"')
 
     if '.streamplusvip.' in url:
-        data = do_downloadpage(url)
+        data = do_downloadpage(url, headers=headers)
 
         video = scrapertools.find_single_match(data, "watch_video.php(.*?)'")
         hostr = scrapertools.find_single_match(data, "hostRedirection.*?'(.*?)'")
@@ -461,14 +463,14 @@ def play(item):
         if video:
             if hostr:
                 url = 'https://1.streamplusvip.xyz/player/ip.php/' + video
-                data = do_downloadpage(url)
+                data = do_downloadpage(url, headers=headers)
 
                 _iss = scrapertools.find_single_match(data, 'iss="(.*?)"')
                 if _iss: url = hostr +'/' + _iss
 
     elif '/mostrarEnlace' in url or '/validaEnlace' in url:
         url = url.replace('/mostrarEnlace', '/validaEnlace')
-        url = httptools.downloadpage(url, timeout = 30, follow_redirects=False).headers.get('location', '')
+        url = httptools.downloadpage(url, headers=headers, timeout = 30, follow_redirects=False).headers.get('location', '')
         if url == 'https://streamplusvip.xyz': url = ''
 
     if '/hqq.' in url or '/waaw.' in url or '/netu' in url:

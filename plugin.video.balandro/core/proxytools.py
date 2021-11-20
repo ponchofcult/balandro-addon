@@ -931,6 +931,7 @@ def testear_lista_proxies(provider, url, proxies=[]):
     if proceso_test:
         pendent = [a for a in threads if a.isAlive()]
         maxValidos = config.get_setting('proxies_memory', default=5)
+        proxies_validos = config.get_setting('proxies_validos', default=True)
 
         while len(pendent) > 0:
             hechos = num_proxies - len(pendent)
@@ -940,13 +941,9 @@ def testear_lista_proxies(provider, url, proxies=[]):
             progreso.update(perc, 'Comprobando %d de %d proxies. Válidos %d. Cancelar si tarda demasiado o si ya hay más de uno válido.' % (hechos, num_proxies, validos))
 
             if proxies_limit:
+                if validos >= 10: break # si todos los 10 más rápidos
+            elif proxies_validos:
                 if validos >= maxValidos: break # valores 3,4,5,6,7,8,9
-
-                elif validos >= 10: break # si todos los 10 más rápidos
-                elif validos >= 3: break # los 3 más rápidos
-            else: 
-                if validos >= 3: break # los 3 más rápidos
-                elif validos >= 10: break # si todos los 10 más rápidos
 
             if progreso.iscanceled(): break
 

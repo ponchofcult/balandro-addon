@@ -121,12 +121,16 @@ def login(item):
                        config.set_setting('playdede_login', True, 'playdede')
 
                    platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
+
+                   platformtools.itemlist_refresh()
                    return True
 
        if 'UserOn' in data:
            if not status:
                config.set_setting('playdede_login', True, 'playdede')
                platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
+
+           platformtools.itemlist_refresh()
            return True
     except:
        platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin acceso Web[/COLOR]')
@@ -142,10 +146,14 @@ def login(item):
        if not jdata['alert']:
            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
+
+           platformtools.itemlist_refresh()
            return True
        elif bool(jdata['reload']):
            platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
            config.set_setting('playdede_login', True, 'playdede')
+
+           platformtools.itemlist_refresh()
            return True
        else:
            platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
@@ -160,6 +168,8 @@ def login(item):
     if httptools.get_cookie(host, 'utoken'):
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
+
+        platformtools.itemlist_refresh()
         return True
 
     try:
@@ -171,6 +181,8 @@ def login(item):
     if httptools.get_cookie(host, 'utoken'):
         platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Login correcto[/COLOR]')
         config.set_setting('playdede_login', True, 'playdede')
+
+        platformtools.itemlist_refresh()
         return True
 
     platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Login incorrecto[/COLOR]')
@@ -186,10 +198,12 @@ def logout(item):
         data = do_make_login_logout(host + 'user/' + username + '/salir/')
 
         config.set_setting('playdede_login', False, 'playdede')
-        platformtools.dialog_notification(config.__addon_name, '[COLOR yellow]PlayDede Sesión cerrada[/COLOR]')
+        platformtools.dialog_notification(config.__addon_name, '[COLOR chartreuse]PlayDede Sesión cerrada[/COLOR]')
+
+        platformtools.itemlist_refresh()
         return True
 
-    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede No se cerró la Sesión[/COLOR]')
+    platformtools.dialog_notification(config.__addon_name, '[COLOR red]PlayDede Sin cerrar Sesión[/COLOR]')
     return False
 
 
@@ -226,8 +240,9 @@ def do_downloadpage(url, post=None, referer=None):
         if not config.get_setting('playdede_login', 'playdede', default=False):
             platformtools.dialog_notification(config.__addon_name, '[COLOR yellow][B]PlayDede Debe iniciar Sesión[/B][/COLOR]')
 
-        login('')
-        return do_downloadpage(url, post=post, referer=referer)
+        result = login('')
+        if result == True:
+            return do_downloadpage(url, post=post, referer=referer)
 
     return data
 
@@ -237,11 +252,13 @@ def mainlist(item):
     itemlist = []
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+
         itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
-
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+        platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = 'Películas', action = 'mainlist_pelis' ))
@@ -264,11 +281,13 @@ def mainlist_pelis(item):
     itemlist = []
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+
         itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
-
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+        platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'peliculas/', slug = 'peliculas', nro_pagina = 1, search_type = 'movie' ))
@@ -295,11 +314,13 @@ def mainlist_series(item):
     itemlist = []
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+
         itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
-
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+        platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'series/', slug = 'series', nro_pagina = 1, search_type = 'tvshow' ))
@@ -328,11 +349,13 @@ def mainlist_animes(item):
     itemlist = []
 
     if not config.get_setting('playdede_login', 'playdede', default=False):
+        itemlist.append(item.clone( title = '[COLOR chartreuse]Iniciar sesión[/COLOR]', action = 'login' ))
+
         itemlist.append(item_configurar_proxies(item))
 
-        itemlist.append(item.clone( title = '[COLOR teal]Iniciar sesión[/COLOR]', action = 'login' ))
-
         itemlist.append(Item( channel='helper', action='show_help_register', title='Información para registrase', thumbnail=config.get_thumb('help'), text_color='green' ))
+
+        platformtools.itemlist_refresh()
 
     if config.get_setting('playdede_login', 'playdede', default=False):
         itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'animes/', slug = 'animes', nro_pagina = 1, search_type = 'tvshow' ))
@@ -748,6 +771,10 @@ def findvideos(item):
         ses += 1
 
         if not url or not server: continue
+
+        if 'https://netload.cc/st?' in url:
+             url = scrapertools.find_single_match(url, '&url=(.*?)$')
+             if not url: continue
 
         if lang.lower() == 'espsub':
             lang = 'Vose'

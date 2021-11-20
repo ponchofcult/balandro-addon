@@ -364,16 +364,29 @@ def findvideos(item):
 def normalize_other(srv):
     # hydrax no es pot resoldre
 
-    srv = srv.replace('.to', '').lower()
+    srv = srv.replace('.to', '').replace('.com', '').replace('.xyz', '').lower()
 
     if srv == 'peliscloud': link_other = 'cloud'
     elif srv == 'damedamehoy': link_other = 'dame'
+    elif srv == 'tomatomatela': link_other = 'dame'
     elif srv == 'suppervideo': link_other = 'super'
     else:
        if config.get_setting('developer_mode', default=False): link_other = srv
        else: link_other = ''
 
     return link_other
+
+
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
 
 
 def play(item):
@@ -401,10 +414,7 @@ def play(item):
                 return itemlist
 
         elif item.other == 'dame':
-            url = item.url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-            data = do_downloadpage(url)
-            url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-            url = url.replace('\\/', '/')
+            url = resuelve_dame_toma(item.url)
 
             if url:
                 itemlist.append(item.clone(url=url , server=servidor))
@@ -428,14 +438,11 @@ def play(item):
                     return itemlist
 
             for url in matches:
-                if 'https://damedamehoy.xyz/embed.html#' in url:
-                    url = url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-                    data = do_downloadpage(url)
+                if '//damedamehoy.' in url or '//tomatomatela.' in url:
+                    url = resuelve_dame_toma(url)
 
-                    url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-                    url = url.replace('\\/', '/')
                     if url:
-                        itemlist.append(item.clone(url=url , server=servidor))
+                        itemlist.append(item.clone(url=url , server='directo'))
                         return itemlist
 
                 servidor = servertools.get_server_from_url(url)

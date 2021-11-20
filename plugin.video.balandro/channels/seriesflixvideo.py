@@ -115,7 +115,7 @@ def list_all(item):
 
     for article in matches[item.page * perpage:]:
         url = scrapertools.find_single_match(article, ' href="([^"]+)')
-        title = scrapertools.find_single_match(article, ' <h2 class="Title">(.*?)</h2>').strip()
+        title = scrapertools.find_single_match(article, '<h2 class="Title">(.*?)</h2>').strip()
         if not url or not title: continue
 
         thumb = scrapertools.find_single_match(article, ' data-src="([^"]+)')

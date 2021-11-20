@@ -15,7 +15,7 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://cuevana3.so'
+host = 'https://www1.cuevana3.so'
 
 perpage = 22
 
@@ -24,6 +24,7 @@ def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
     # ~  por si viene de enlaces guardados
     url = url.replace('https://www1.cuevana3.video', host)
     url = url.replace('https://www2.cuevana3.video', host)
+    url = url.replace('https://https://cuevana3.so', host)
 
     resp = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror)
 
@@ -362,7 +363,8 @@ def normalize_other(url):
 
     if 'pelisplus' in url: link_other = 'plus'
     elif 'peliscloud' in url: link_other = 'cloud'
-    elif 'damedame' in url: link_other = 'dame'
+    elif 'damedamehoy' in url: link_other = 'dame'
+    elif 'tomatomatela' in url: link_other = 'dame'
     elif 'hydrax' in url: link_other = 'hydrax'
     else:
        if config.get_setting('developer_mode', default=False):
@@ -374,6 +376,18 @@ def normalize_other(url):
               link_other = url
 
     return link_other
+
+
+def resuelve_dame_toma(dame_url):
+    data = do_downloadpage(dame_url)
+
+    url = scrapertools.find_single_match(data, 'file:\s*"([^"]+)')
+    if not url:
+        checkUrl = dame_url.replace('embed.html#', 'details.php?v=')
+        data = do_downloadpage(checkUrl, headers={'Referer': dame_url})
+        url = scrapertools.find_single_match(data, '"file":\s*"([^"]+)').replace('\\/', '/')
+
+    return url
 
 
 def play(item):
@@ -418,14 +432,11 @@ def play(item):
         matches = scrapertools.find_multiple_matches(data, 'data-video="(.*?)"')
 
         for url in matches:
-            if 'https://damedamehoy.xyz/embed.html#' in url:
-                url = url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-                data = do_downloadpage(url, raise_weberror=False )
+            if '//damedamehoy.' in url or '//tomatomatela.' in url :
+                url = resuelve_dame_toma(url)
 
-                url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-                url = url.replace('\\/', '/')
                 if url:
-                    itemlist.append(item.clone(url=url , server=servidor))
+                    itemlist.append(item.clone(url=url , server='directo'))
                     return itemlist
 
             servidor = servertools.get_server_from_url(url)
@@ -456,13 +467,11 @@ def play(item):
         return itemlist
 
     elif item.other == 'dame':
-        url = item.url.replace('https://damedamehoy.xyz/embed.html#', 'https://damedamehoy.xyz/details.php?v=')
-        data = do_downloadpage(url, raise_weberror=False)
-        url = scrapertools.find_single_match(data, '"file":"(.*?)"')
-        url = url.replace('\\/', '/')
+        url = resuelve_dame_toma(item.url)
 
-        itemlist.append(item.clone(url=url , server='directo'))
-        return itemlist
+        if url:
+            itemlist.append(item.clone(url=url , server=servidor))
+            return itemlist
 
     return itemlist
 

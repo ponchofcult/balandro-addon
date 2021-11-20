@@ -279,8 +279,6 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
     else:
         url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
 
-    url = quote(url, safe="%/:=&?~#+!$,;'@()*[]")
-
     if type(post) == dict: post = urlencode(post)
 
     # Limitar tiempo de descarga si no se ha pasado timeout y hay un valor establecido en la variable global
@@ -337,7 +335,7 @@ def downloadpage(url, post=None, headers=None, timeout=None, follow_redirects=Tr
         if isinstance(post, unicode):
             post = post.encode('utf-8', 'strict')
 
-    req = Request(url ,post,request_headers)
+    req = Request(url, post, request_headers)
 
     try:
         handle = opener.open(req, timeout=timeout)

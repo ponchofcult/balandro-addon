@@ -27,8 +27,14 @@ def configurar_proxies(item):
     return proxytools.configurar_proxies_canal(item.channel, host)
 
 def do_downloadpage(url, post=None):
-    # ~ data = httptools.downloadpage(url, post=post).data
-    data = httptools.downloadpage_proxy('gnula', url, post=post).data
+    # ~ timeout
+    timeout = 40
+
+    if '/generos/' in url:
+        timeout = 50
+
+    # ~ data = httptools.downloadpage(url, post=post, timeout=timeout).data
+    data = httptools.downloadpage_proxy('gnula', url, post=post, timeout=timeout).data
     return data
 
 

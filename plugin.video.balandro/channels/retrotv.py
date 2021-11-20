@@ -170,7 +170,7 @@ def list_epis(item):
         url = scrapertools.find_single_match(match, ' href="(.*?)"')
         url = url.strip()
 
-        seas_epis = scrapertools.find_single_match(match, '<span class=ClB>(\d+)x(\d+)</span>')
+        seas_epis = scrapertools.find_single_match(match, '<span class="ClB">(\d+)x(\d+)</span>')
 
         if not seas_epis: continue
 
@@ -189,14 +189,15 @@ def list_epis(item):
 
     tmdb.set_infoLabels(itemlist)
 
-    if '<div class="wp-pagenavi">' in data:
-         if '<a class="page-numbers"' in data:
-            next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
+    if itemlist:
+        if '<div class="wp-pagenavi">' in data:
+             if '<a class="page-numbers"' in data:
+                next_url = scrapertools.find_single_match(data, 'class="page-numbers current".*?href="(.*?)"')
 
-            if next_url:
-                next_url = next_url.strip()
-                if '/page/' in next_url:
-                    itemlist.append(item.clone (url = next_url, title = '>> Página siguiente', action = 'list_epis', text_color='coral' ))
+                if next_url:
+                    next_url = next_url.strip()
+                    if '/page/' in next_url:
+                        itemlist.append(item.clone (url = next_url, title = '>> Página siguiente', action = 'list_epis', text_color='coral' ))
 
     return itemlist
 
